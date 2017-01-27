@@ -1,0 +1,24 @@
+{
+  "name": "no-name",
+  "version": "1.0.0",
+  "description": "no description",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "mongoose": "^4.7.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikefitz888/WebTech.git"
+  },
+  "author": "Michael Fitzpatrick + Jamie Willis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mikefitz888/WebTech/issues"
+  },
+  "homepage": "https://github.com/mikefitz888/WebTech#readme"
+}
