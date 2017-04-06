@@ -6,10 +6,32 @@
 		<script type="text/javascript">
 		//navigator.geolocation
 		//var battery = navigator.battery || navigator.webkitBattery || navigator.mozBattery;
-		$(document).ready(function(){
+		$(function(){
 			$("#side_panel_right .info-panel-sub").on("click", function(e){
 				//Do stuff
-			})
+			});
+
+			$(".login_button").on("click", function(e){
+				$(".login").show();
+			});
+
+			$("#login-form form").submit(function(e){
+				$.ajax({
+	           		type: "POST",
+	           		url: "/login",
+	           		data: $("#login-form form").serialize(), // serializes the form's elements.
+	           		success: function(data)
+	           		{
+	               		if(data == "success"){
+	               			window.location.reload();
+	               		}else{
+
+	               		}
+	           		}
+         		});
+
+	    		e.preventDefault();
+			});
 		});
 		</script>
 
@@ -290,20 +312,38 @@
 				float:left;
 			}
 
+			.login {
+				display: none;
+			}
+
 			#login-form [type="submit"]{
 				margin-top:20px;
+			}
+
+			.login_button {
+				display: block;
+				width: 100%;
+				height: 100%;
+				background: rgb(0, 162, 217) none repeat scroll 0% 0%;
+				line-height: 42px;
+				text-decoration: none;
+				text-align: center;
+				text-decoration: none;
+				color:#fff;
 			}
 
 			br { /*clearfix*/
 				clear: both;
 			}
 		</style>
+		<script src="https://cdn.webrtc-experiment.com/getScreenId.js"> </script>
 	</head>
 	<body>
-		<div id="login-dark-fade"></div>
-		<div id="login-form">
+		<div id="login-dark-fade" class="login"></div>
+		<div id="login-form" class="login">
 			<form action="/login" method="post">
 				<h3>Login</h3>
+				<span class="error hidden">Incorrect username + password combination.</span>
 				<span>
 					<label for="username">Username</label><br />
 					<input name="username" type="input" />
@@ -313,7 +353,6 @@
 					<label for="password">Password</label><br />
 					<input name="password" type="password" />
 				</span>
-				
 				<input type="submit" value="Login" />
 			</form>
 		</div>
@@ -328,7 +367,7 @@
 					{{? it.auth }}
 					{{=it.username}}<a href="/logout">logout</a>
 					{{??}}
-					<a href="/login">login</a>
+					<a href="#" class="login_button">Login</a>
 					{{?}}
 				</span>
 			</span>

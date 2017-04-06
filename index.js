@@ -1,11 +1,15 @@
 //Explore Express middleware
 
 var fs = require('fs'); //filesystem
+var https = require('https');
 var express = require('express');
 var session = require('express-session');
 var path = require("path");
 var bodyParser = require("body-parser");
-var dot = require('dot').process({path: "./views"});
+var dot = require('dot');
+
+dot.templateSettings.strip = false;
+dot.process({path: "./views"});
 
 var file = "site.db";
 var exists = fs.existsSync(file);
@@ -90,7 +94,7 @@ app.use(bodyParser.json());
 app.engine('js', function(filePath, options, callback){
 	var header = require('./views/header');
 	var render = require(filePath.substring(0, filePath.length - 3));
-	var output = header({auth: true, username: "A. Sample"}) + render(options);
+	var output = header({auth: options.auth, username: "A. Sample", target: options.target}) + render(options);
 
 	return callback(null, output);
 });
@@ -102,24 +106,90 @@ app.set('view engine', 'js');
 app.get('/', function (req, res) {
   //res.send('/.*fly$/')
   //res.sendFile('base.html', options);
-  res.render('base', {title: req.session.auth});
-});
-
-app.get('/login', function (req, res) {
-  //res.send('/.*fly$/')
-  //res.sendFile('base.html', options);
-  res.render('login', {title: req.session.auth});
+  res.render('base', {target: "/", auth: req.session.auth});
 });
 
 app.post('/login', function(req, res){
-	req.session.auth = req.body.username;
-	res.redirect(req.body.target);
+	db.serialize(function(){
+		db.get("SELECT id FROM users WHERE username = ? AND password = ?", req.body.username, req.body.password, function(err, row){
+			if(row){
+				req.session.auth = true;
+				res.send("success"); //Successful
+			}else{
+				res.send("failure"); //Failure
+			}
+		});
+	});
 });
 
 app.get('/logout', function(req, res){
 	req.session.destroy();
+	res.redirect("/");
 });
 
-app.listen(8080, function(){
-	console.log('Server listening on port 8080.');
+app.get('/dbsetup', function(req, res){
+	db.serialize(function(){
+		//db.run("CREATE TABLE users (id INTEGER PRIMARY KEY, username VARCHAR(10), password VARCHAR(10))");
+		//db.run("INSERT INTO users (username, password) VALUES ('admin', 'salty')");
+	});
+	res.send("success");
 });
+
+app.get('/stream', function(req, res){
+	var file = path.resolve(__dirname,"movie.mp4");
+	console.log(file);
+    fs.stat(file, function(err, stats) {
+	    if (err) {
+		    if (err.code === 'ENOENT') {
+		        // 404 Error if file not found
+		        return res.sendStatus(404);
+		    }
+		    res.end(err);
+		}
+	    
+	    var range = req.headers.range;
+	    if (!range) {
+	        // 416 Wrong range
+	    	return res.sendStatus(416);
+	    }
+	    var positions = range.replace(/bytes=/, "").split("-");
+	    var start = parseInt(positions[0], 10);
+	    var total = stats.size;
+	    var end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+	    var chunksize = (end - start) + 1;
+
+	    var maxChunk = 1024 * 1024; // 1MB at a time
+		if (chunksize > maxChunk) {
+		  end = start + maxChunk - 1;
+		  chunksize = (end - start) + 1;
+		}
+
+		res.writeHead(206, {
+			"Content-Range": "bytes " + start + "-" + end + "/" + total,
+			"Accept-Ranges": "bytes",
+			"Content-Length": chunksize,
+			"Content-Type": "video/mp4"
+		});
+
+      	var stream = fs.createReadStream(file, { start: start, end: end, autoClose: true }).on("open", function() {
+        	stream.pipe(res);
+        }).on("error", function(err) {
+            res.end(err);
+        });
+    });
+});
+
+var options = {
+	key: fs.readFileSync('server.key'),
+	cert: fs.readFileSync('server.crt'),
+	requestCert: false,
+	rejectUnauthorized: false,
+	passphrase: "password"
+};
+var server = https.createServer(options, app).listen(3000, function(){
+	console.log("Server started at port 3000");
+});
+
+/*app.listen(8000, function(){
+	console.log('Server listening on port 8000.');
+});*/
