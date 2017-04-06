@@ -3,6 +3,7 @@
 	<head>
 		<title>Template Page</title>
 		<script src="assets/js/jquery-3.1.1.min.js"></script>
+		<script src="assets/js/webrtc.js"></script>
 		<script type="text/javascript">
 		//navigator.geolocation
 		//var battery = navigator.battery || navigator.webkitBattery || navigator.mozBattery;
@@ -32,6 +33,8 @@
 
 	    		e.preventDefault();
 			});
+
+			pageReady();
 		});
 		</script>
 
@@ -336,7 +339,7 @@
 				clear: both;
 			}
 		</style>
-		<script src="https://cdn.webrtc-experiment.com/getScreenId.js"> </script>
+		<!--<script src="https://cdn.webrtc-experiment.com/getScreenId.js"> </script>-->
 	</head>
 	<body>
 		<div id="login-dark-fade" class="login"></div>

@@ -4,6 +4,7 @@ var fs = require('fs'); //filesystem
 var https = require('https');
 var express = require('express');
 var session = require('express-session');
+
 var path = require("path");
 var bodyParser = require("body-parser");
 var dot = require('dot');
@@ -22,12 +23,13 @@ var app = express();
 **  Security Settings
 */
 
-app.use(session({ //Prevent targetted attacks
+var sessionParser = session({ //Prevent targetted attacks
 	secret: '59E83B2F12591BCC496A77C83DC39', //doesn't need to be kept secret, just not default
 	name: 's_id',
 	resave: true,
 	saveUninitialized: true
-}));
+});
+app.use(sessionParser);
 app.disable('x-powered-by'); //Prevent targetted attacks
 
 //Custom authentication middleware
@@ -106,6 +108,7 @@ app.set('view engine', 'js');
 app.get('/', function (req, res) {
   //res.send('/.*fly$/')
   //res.sendFile('base.html', options);
+  req.session.frog = "gogo";
   res.render('base', {target: "/", auth: req.session.auth});
 });
 
@@ -183,13 +186,11 @@ var options = {
 	key: fs.readFileSync('server.key'),
 	cert: fs.readFileSync('server.crt'),
 	requestCert: false,
-	rejectUnauthorized: false,
-	passphrase: "password"
+	rejectUnauthorized: false
 };
 var server = https.createServer(options, app).listen(3000, function(){
 	console.log("Server started at port 3000");
 });
 
-/*app.listen(8000, function(){
-	console.log('Server listening on port 8000.');
-});*/
+
+require('./signalling')(server, sessionParser);
