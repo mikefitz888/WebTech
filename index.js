@@ -16,6 +16,7 @@ var file = "site.db";
 var exists = fs.existsSync(file);
 var sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database(file);
+var output = new Object();
 
 var app = express();
 
@@ -108,8 +109,17 @@ app.set('view engine', 'js');
 app.get('/', function (req, res) {
   //res.send('/.*fly$/')
   //res.sendFile('base.html', options);
-  req.session.frog = "gogo";
+  req.session.auth = true;
+  req.session.username = "admin";
   res.render('base', {target: "/", auth: req.session.auth});
+});
+
+app.get('/aid', function (req, res) {
+  //res.send('/.*fly$/')
+  //res.sendFile('base.html', options);
+  req.session.auth = true;
+  req.session.username = "helper";
+  res.render('aid', {target: "/aid", auth: req.session.auth});
 });
 
 app.post('/login', function(req, res){
@@ -117,12 +127,18 @@ app.post('/login', function(req, res){
 		db.get("SELECT id FROM users WHERE username = ? AND password = ?", req.body.username, req.body.password, function(err, row){
 			if(row){
 				req.session.auth = true;
+				req.session.username = req.body.username;
 				res.send("success"); //Successful
 			}else{
 				res.send("failure"); //Failure
 			}
 		});
 	});
+});
+
+app.get('/requests', function(req, res){
+	console.log(output);
+	res.send("check log");
 });
 
 app.get('/logout', function(req, res){
@@ -188,9 +204,31 @@ var options = {
 	requestCert: false,
 	rejectUnauthorized: false
 };
-var server = https.createServer(options, app).listen(3000, function(){
+var server = https.createServer(options, app).listen(3000, '0.0.0.0', function(){
 	console.log("Server started at port 3000");
 });
 
+var communication_list = new Object();
+var CommunicationData = function(){
+	this.IceCandidates = [];
+	this.SessionDescription;
+}
 
-require('./signalling')(server, sessionParser);
+function recieveIceCandidate(message){
+	if(!communication_list.hasOwnProperty(this.username)) communication_list[this.username] = new CommunicationData();
+	communication_list[this.username].IceCandidates.push(message);
+}
+
+function recieveSessionDescription(message){
+	if(!communication_list.hasOwnProperty(this.username)) communication_list[this.username] = new CommunicationData();
+	communication_list[this.username].SessionDescription = message;
+}
+
+function sendCommunicationData(username){
+	return JSON.stringify({
+		IceCandidates: communication_list[username].IceCandidates,
+		SessionDescription: communication_list[username].SessionDescription
+	});
+}
+
+require('./signalling')(server, sessionParser, recieveIceCandidate, recieveSessionDescription, sendCommunicationData);

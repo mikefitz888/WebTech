@@ -1,5 +1,5 @@
 (function(){
-    function itself(server, sessionParser){
+    function itself(server, sessionParser, gotIceCandidate, gotSessionDescription, sendCommunicationData){
         const HTTPS_PORT = 8443;
 
         const fs = require('fs');
@@ -37,16 +37,57 @@
         // Create a server for handling websocket calls
         var wss = new WebSocketServer({server: server});
 
+        var pairings = {
+            admin: 'helper',
+            helper: 'admin'
+        };
+        var socketMap = new Object();
+
         wss.on('connection', function(ws) {
             var session;
             sessionParser(ws.upgradeReq, {}, function(){
                 console.log("New websocket connection");
                 session = ws.upgradeReq.session;
+                if(socketMap.hasOwnProperty(pairings[session.username])){
+                    socketMap[pairings[session.username]].send(JSON.stringify({
+                        type: 'peerConnectionHandle',
+                        message: 'none'
+                    }));
+                }
+                socketMap[session.username] = ws;
             });
+
             ws.on('message', function(message) {
-                // Broadcast any received message to all clients
+                //if(!session.auth) return false; //Ignore unauthorized users
+                var m = JSON.parse(message);
+
+
+                if(m.type == "ice_candidate"){
+                    //gotIceCandidate.call(session, m.message);
+                    socketMap[pairings[session.username]].send(JSON.stringify({
+                        type: 'recieveICECandidate',
+                        message: m.message
+                    }));
+                }
+
+
+                if(m.type == "session_description"){
+                    //gotSessionDescription.call(session, m.message);
+                    socketMap[pairings[session.username]].send(JSON.stringify({
+                        type: 'descriptionHandle',
+                        message: m.message
+                    }));
+                }
+
+                if(m.type == "request_communication"){
+                    ws.send(sendCommunicationData(m.message));
+                }
+
+
+                // Log requests
                 console.log('received: %s', message);
-                wss.broadcast(message);
+                //wss.broadcast(message);
+                
             });
 
             ws.on('close', function(){

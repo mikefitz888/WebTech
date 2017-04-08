@@ -6,37 +6,74 @@ var peerConnectionConfig = {
 };
 
 var CommunicationServer = function(){
-	this.peerConnection = peerConnection;
+	var _this = this;
+	console.log("CommunicationServer created.");
+	this.peerConnection;
 	this.serverConnection = new WebSocket('wss://' + window.location.hostname + ':3000');
-    this.serverConnection.onmessage = this.parseMessage;
+    this.serverConnection.onmessage = (message)=>{
+    	console.log(message);
+    	var signal = JSON.parse(message.data);
+    	console.log(signal);
+    	_this[signal.type](signal.message);
+    };
 
-}
+    this.descriptionHandle = null;
+    this.ICECandidateHandle = null;
+    this.peerConnectionHandle = null;
 
-CommunicationServer.prototype.parseMessage = function(message){
-	var signal = JSON.parse(message);
-	// signal = {type, payload}
+    this.send = function(message){_this.serverConnection.send(message);}
 }
 
 CommunicationServer.prototype.sendICECandidate = function(IceCandidate){
-
+	console.log("ICE Candidate sent.");
+	this.send(JSON.stringify({
+        type: "ice_candidate",
+        message: IceCandidate.candidate
+    }));
 }
 
-CommunicationServer.prototype.recieveICECandidate = function(IceCandidate){
-	this.peerConnection.addIceCandidate(IceCandidate).then().catch();
+CommunicationServer.prototype.recieveICECandidate = function(candidate){
+	console.log(candidate);
+	if(!candidate) return;
+	this.peerConnection.addIceCandidate( new RTCIceCandidate(candidate) ).then(()=>{
+		console.log("Added Ice Candidate");
+	}).catch((error)=>{
+		console.log(error);
+	});
 }
 
 CommunicationServer.prototype.sendDescription = function(localDescription){
-
+	console.log("Send Description");
+	this.send(JSON.stringify({
+        type: "session_description",
+        message: localDescription
+    }));
 }
 
-CommunicationServer.prototype.recieveDescription = function(remoteDescription){
-	this.peerConnection.setRemoteDescription(remoteDescription).then().catch();
+CommunicationServer.prototype.recieveDescription = function(){
+	var _this = this;
+	return new Promise((resolve, reject)=>{
+		_this.descriptionHandle = function(description){
+			console.log("Description recieved.");
+			resolve(description);
+		}
+	});
+}
+
+CommunicationServer.prototype.awaitPeerConnection = function(){
+	var _this = this;
+	return new Promise((resolve, reject)=>{
+		_this.peerConnectionHandle = function(){
+			console.log("Peer Connected");
+			resolve();
+		}
+	});
 }
 
 function createPeerConnection(server){
 	var peerConnection = new RTCPeerConnection(peerConnectionConfig);
 	server.peerConnection = peerConnection;
-	peerConnection.onicecandidate = server.sendICECandidate;
+	peerConnection.onicecandidate = function(evt){server.sendICECandidate(evt);};
 	return peerConnection;
 }
 
@@ -46,22 +83,52 @@ function sendCall(){ //PC2
 	peerConnection.onaddstream = setStreamDisplay;
 	//Await offer
 	//Recieve remoteDescription
-	peerConnection.setRemoteDescription( ... );
-	peerConnection.createAnswer( ... );
-	peerConnection.setLocalDescription( ... );
+	server.recieveDescription().then((description)=>{
+		peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch((error)=>{console.log(error);});
+		peerConnection.createAnswer().then((description)=>{
+			peerConnection.setLocalDescription(description).then(()=>{
+				server.sendDescription(description);
+			}).catch((error)=>{console.log(error);});
+		}).catch((error)=>{
+			console.log(error);
+		});
+	}).catch((error)=>{console.log(error);});
+	
+	//peerConnection.setRemoteDescription( ... );
+	
+	//peerConnection.createAnswer( ... );
+	//peerConnection.setLocalDescription( ... );
+	//start sending ice candidates
 }
 
 function awaitCall(){ //PC1
 	var server = new CommunicationServer();
 	var peerConnection = createPeerConnection(server);
-	peerConnection.addStream( ... );
-	peerConnection.createOffer().then( createOfferSuccess.bind(peerConnection) ).catch( createOfferError );
-	//Await remote description
-	peerConnection.setRemoteDescription( ... );
+
+	var constraints = {
+        video: true,
+        audio: false,
+    };
+
+    server.awaitPeerConnection().then(()=>{
+    	console.log("Try to get media device");
+		navigator.mediaDevices.getUserMedia(constraints).then((stream)=>{
+			peerConnection.addStream(stream);
+			document.getElementById('remoteVideo').src = window.URL.createObjectURL(stream);
+			peerConnection.createOffer().then((description)=>{
+				peerConnection.setLocalDescription(description).then(()=>{
+					server.sendDescription(description);
+					server.recieveDescription().then((description)=>{
+						peerConnection.setRemoteDescription( new RTCSessionDescription(description) );
+					}).catch((error)=>{console.log(error);});
+				}).catch(setLocalDescriptionError);
+			}).catch( createOfferError );
+		}).catch((error)=>{console.log(error);});
+	});
 }
 
 function setStreamDisplay(stream){
-	console.log("TODO: SET STREAM TO DISPLAY");
+	document.getElementById('remoteVideo').src = window.URL.createObjectURL(stream.stream);
 }
 
 function createOfferSuccess(description){
