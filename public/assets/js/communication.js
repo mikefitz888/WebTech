@@ -70,6 +70,13 @@ CommunicationServer.prototype.awaitPeerConnection = function(){
 	});
 }
 
+CommunicationServer.prototype.ready = function(){
+	var _this = this;
+	return new Promise((resolve, reject)=>{
+		_this.serverConnection.onopen = resolve;
+	});
+}
+
 function createPeerConnection(server){
 	var peerConnection = new RTCPeerConnection(peerConnectionConfig);
 	server.peerConnection = peerConnection;
@@ -81,24 +88,22 @@ function sendCall(){ //PC2
 	var server = new CommunicationServer();
 	var peerConnection = createPeerConnection(server);
 	peerConnection.onaddstream = setStreamDisplay;
-	//Await offer
-	//Recieve remoteDescription
-	server.recieveDescription().then((description)=>{
-		peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch((error)=>{console.log(error);});
-		peerConnection.createAnswer().then((description)=>{
-			peerConnection.setLocalDescription(description).then(()=>{
-				server.sendDescription(description);
-			}).catch((error)=>{console.log(error);});
-		}).catch((error)=>{
-			console.log(error);
-		});
+	server.ready().then(()=>{
+		server.send(JSON.stringify({
+			type: 'create_connection',
+			partner: 'admin'
+		}));
+		server.recieveDescription().then((description)=>{
+			peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch((error)=>{console.log(error);});
+			peerConnection.createAnswer().then((description)=>{
+				peerConnection.setLocalDescription(description).then(()=>{
+					server.sendDescription(description);
+				}).catch((error)=>{console.log(error);});
+			}).catch((error)=>{
+				console.log(error);
+			});
+		}).catch((error)=>{console.log(error);});
 	}).catch((error)=>{console.log(error);});
-	
-	//peerConnection.setRemoteDescription( ... );
-	
-	//peerConnection.createAnswer( ... );
-	//peerConnection.setLocalDescription( ... );
-	//start sending ice candidates
 }
 
 function awaitCall(){ //PC1

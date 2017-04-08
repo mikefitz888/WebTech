@@ -37,10 +37,7 @@
         // Create a server for handling websocket calls
         var wss = new WebSocketServer({server: server});
 
-        var pairings = {
-            admin: 'helper',
-            helper: 'admin'
-        };
+        var pairings = new Object();
         var socketMap = new Object();
 
         wss.on('connection', function(ws) {
@@ -48,18 +45,22 @@
             sessionParser(ws.upgradeReq, {}, function(){
                 console.log("New websocket connection");
                 session = ws.upgradeReq.session;
-                if(socketMap.hasOwnProperty(pairings[session.username])){
-                    socketMap[pairings[session.username]].send(JSON.stringify({
-                        type: 'peerConnectionHandle',
-                        message: 'none'
-                    }));
-                }
+
                 socketMap[session.username] = ws;
             });
 
             ws.on('message', function(message) {
                 //if(!session.auth) return false; //Ignore unauthorized users
                 var m = JSON.parse(message);
+
+                if(m.type == "create_connection"){
+                    pairings[session.username] = m.partner;
+                    pairings[m.partner] = session.username;
+                    socketMap[pairings[session.username]].send(JSON.stringify({
+                        type: 'peerConnectionHandle',
+                        message: 'none'
+                    }));
+                }
 
 
                 if(m.type == "ice_candidate"){
@@ -91,6 +92,7 @@
             });
 
             ws.on('close', function(){
+                delete socketMap[session.username];
                 console.log("CLOSING");
                 console.log(session);
             });
