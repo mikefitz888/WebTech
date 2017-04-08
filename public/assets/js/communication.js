@@ -111,7 +111,9 @@ function awaitCall(){ //PC1
 	var peerConnection = createPeerConnection(server);
 
 	var constraints = {
-        video: true,
+        video: {
+        	mediaSource: 'window' || 'screen'
+        },
         audio: false,
     };
 

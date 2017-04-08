@@ -42,6 +42,11 @@ var auth = function(req, res, next){
 	}
 };
 
+var sessionShare = function(req, res, next){
+	res.locals.session = req.session;
+	next();
+}
+
 function generalHeaders(res, path, stat){
 	res.set('Content-Security-Policy', "script-src 'self'"); //Prevent cross-site scripting. Important, add urls of CDNs if used
 	//res.set('Public-Key-Pins', 'pin-sha256="base64=="; max-age=expireTime; includeSubDomains'); //Enable public-key pinning, prevent man-in-middle forged cert attacks
@@ -67,38 +72,30 @@ app.use('/assets/images', express.static( path.join(__dirname, 'public/assets/im
 app.use('/assets/css', express.static( path.join(__dirname, 'public/assets/css'), options('text/css') ));
 app.use('/assets/js', express.static( path.join(__dirname, 'public/assets/js'), options('application/javascript') ));
 
+app.use('/assets/fonts/FontAwesome.otf', express.static( path.join(__dirname, 'public/assets/fonts/FontAwesome.otf'), options('application/x-font-opentype') ));
+app.use('/assets/fonts/fontawesome-webfont.eot', express.static( path.join(__dirname, 'public/assets/fonts/fontawesome-webfont.eot'), options('application/vnd.ms-fontobject') ));
+app.use('/assets/fonts/fontawesome-webfont.svg', express.static( path.join(__dirname, 'public/assets/fonts/fontawesome-webfont.svg'), options('image/svg+xml') ));
+app.use('/assets/fonts/fontawesome-webfont.ttf', express.static( path.join(__dirname, 'public/assets/fonts/fontawesome-webfont.ttf'), options('application/x-font-truetype') ));
+app.use('/assets/fonts/fontawesome-webfont.woff', express.static( path.join(__dirname, 'public/assets/fonts/fontawesome-webfont.woff'), options('application/font-woff') ));
+app.use('/assets/fonts/fontawesome-webfont.woff2', express.static( path.join(__dirname, 'public/assets/fonts/fontawesome-webfont.woff2'), options('application/font-woff2') ));
+
+/* MIME types for font-awesome icons
+	.eot - application/vnd.ms-fontobject
+	.woff - application/font-woff
+	.woff2 - application/font-woff2
+	.ttf - application/x-font-truetype
+	.svg - image/svg+xml
+	.otf - application/x-font-opentype
+*/
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 //Template engine for controlling variable content in webpages. Usage: res.render('name', {title:'blah', message:'blah', ...}); 
-//2nd arg recieved in options
-/*app.engine('html', function(filePath, options, callback){
-	fs.readFile(filePath, function(err, content){
-		var rendered = content.toString();
-		var includes = new RegExp('\\[\\[((?:\\\\.|[^\\[\\]\\\\])*)\\]\\]', 'g');
-		var output = rendered.replace(includes, function(match, capture, offset, string){
-			return fs.readFileSync('./views/'+capture, 'utf8');
-		});
-
-		//Replaces {{some_text}} in the html file, with options.some_text, as defined during res.render(...)
-		var variables = new RegExp('{{((?:\\\\.|[^{}\\\\])*)}}', 'g');
-		var output = output.replace(variables, function(match, capture, offset, string){
-			if(options.hasOwnProperty(capture)){
-				return options[capture];
-			}else{
-				console.error('options does not have property: ' + capture);
-				return '{{ERROR: \''+capture+'\' is not defined.}}';
-			}
-		});
-		return callback(null, output);
-	});
-});*/
-
 app.engine('js', function(filePath, options, callback){
 	var header = require('./views/header');
 	var render = require(filePath.substring(0, filePath.length - 3));
-	var output = header({auth: options.auth, username: "A. Sample", target: options.target}) + render(options);
-
+	var output = header({auth: session.auth, username: session.username || "Anonymous"}) + render(options);
 	return callback(null, output);
 });
 
@@ -106,15 +103,19 @@ app.set('views', './views'); //Specify directory containing view templates
 app.set('view engine', 'js');
 
 //Take care of routing
-app.get('/', function (req, res) {
+app.get('/', sessionShare, function(req, res){
+	res.render('index', {target: "/get", auth: req.session.auth});
+});
+
+app.get('/find', function (req, res) {
   //res.send('/.*fly$/')
   //res.sendFile('base.html', options);
   req.session.auth = true;
   req.session.username = "admin";
-  res.render('base', {target: "/", auth: req.session.auth});
+  res.render('base', {target: "/get", auth: req.session.auth});
 });
 
-app.get('/aid', function (req, res) {
+app.get('/give', function (req, res) {
   //res.send('/.*fly$/')
   //res.sendFile('base.html', options);
   req.session.auth = true;
@@ -152,50 +153,6 @@ app.get('/dbsetup', function(req, res){
 		//db.run("INSERT INTO users (username, password) VALUES ('admin', 'salty')");
 	});
 	res.send("success");
-});
-
-app.get('/stream', function(req, res){
-	var file = path.resolve(__dirname,"movie.mp4");
-	console.log(file);
-    fs.stat(file, function(err, stats) {
-	    if (err) {
-		    if (err.code === 'ENOENT') {
-		        // 404 Error if file not found
-		        return res.sendStatus(404);
-		    }
-		    res.end(err);
-		}
-	    
-	    var range = req.headers.range;
-	    if (!range) {
-	        // 416 Wrong range
-	    	return res.sendStatus(416);
-	    }
-	    var positions = range.replace(/bytes=/, "").split("-");
-	    var start = parseInt(positions[0], 10);
-	    var total = stats.size;
-	    var end = positions[1] ? parseInt(positions[1], 10) : total - 1;
-	    var chunksize = (end - start) + 1;
-
-	    var maxChunk = 1024 * 1024; // 1MB at a time
-		if (chunksize > maxChunk) {
-		  end = start + maxChunk - 1;
-		  chunksize = (end - start) + 1;
-		}
-
-		res.writeHead(206, {
-			"Content-Range": "bytes " + start + "-" + end + "/" + total,
-			"Accept-Ranges": "bytes",
-			"Content-Length": chunksize,
-			"Content-Type": "video/mp4"
-		});
-
-      	var stream = fs.createReadStream(file, { start: start, end: end, autoClose: true }).on("open", function() {
-        	stream.pipe(res);
-        }).on("error", function(err) {
-            res.end(err);
-        });
-    });
 });
 
 var options = {
