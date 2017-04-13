@@ -43,6 +43,7 @@ var auth = function(req, res, next){
 };
 
 var sessionShare = function(req, res, next){
+	console.log("sharingSession");
 	res.locals.session = req.session;
 	next();
 }
@@ -95,7 +96,7 @@ app.use(bodyParser.json());
 app.engine('js', function(filePath, options, callback){
 	var header = require('./views/header');
 	var render = require(filePath.substring(0, filePath.length - 3));
-	var output = header({auth: session.auth, username: session.username || "Anonymous"}) + render(options);
+	var output = header({auth: options.session.auth, username: options.session.username || "Anonymous"}) + render(options);
 	return callback(null, output);
 });
 
@@ -112,7 +113,8 @@ app.get('/find', function (req, res) {
   //res.sendFile('base.html', options);
   req.session.auth = true;
   req.session.username = "admin";
-  res.render('base', {target: "/get", auth: req.session.auth});
+  //console.log(req.session);
+  res.render('base', {target: "/get", session: req.session});
 });
 
 app.get('/give', function (req, res) {
@@ -120,7 +122,7 @@ app.get('/give', function (req, res) {
   //res.sendFile('base.html', options);
   req.session.auth = true;
   req.session.username = "helper";
-  res.render('aid', {target: "/aid", auth: req.session.auth});
+  res.render('aid', {target: "/aid", session: req.session});
 });
 
 app.post('/login', function(req, res){

@@ -38,6 +38,10 @@
         var wss = new WebSocketServer({server: server});
 
         var pairings = new Object();
+        pairings = {
+            helper: "admin",
+            admin: "helper"
+        }
         var socketMap = new Object();
 
         wss.on('connection', function(ws) {
@@ -47,6 +51,7 @@
                 session = ws.upgradeReq.session;
 
                 socketMap[session.username] = ws;
+                console.log("Socket mapped for " + session.username);
             });
 
             ws.on('message', function(message) {
