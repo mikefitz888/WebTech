@@ -1,6 +1,6 @@
 (function(){function footer(it
 /**/) {
-var out='\t\t<footer>&copy; 2017;</footer>\n\t</body>\n</html>';return out;
+var out='\t\t<footer>&copy; 2017;</footer>\r\n\t</body>\r\n</html>';return out;
 }var itself=footer, _encodeHTML=(function (doNotSkipEncoded) {
 		var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': "&#34;", "'": "&#39;", "/": "&#47;" },
 			matchHTML = doNotSkipEncoded ? /[&<>"'\/]/g : /&(?!#?\w+;)|<|>|"|'|\//g;
