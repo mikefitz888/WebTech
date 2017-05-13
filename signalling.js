@@ -1,3 +1,4 @@
+"use strict";
 (function(){
     function itself(server, sessionParser){
         const HTTPS_PORT = 8443;
@@ -93,7 +94,7 @@
                 // Log requests
                 console.log('received: %s', message);
                 //wss.broadcast(message);
-                
+
             });
 
             ws.on('close', function(){

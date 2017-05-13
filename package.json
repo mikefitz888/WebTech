@@ -9,7 +9,8 @@
     "express-session": "^1.0.0",
     "body-parser": "^1.0.0",
     "dot": "^1.0.0",
-    "ws": "^2.2.3"
+    "ws": "^2.2.3",
+    "sjcl": "^1.0.6"
   },
   "devDependencies": {},
   "scripts": {

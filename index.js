@@ -1,3 +1,4 @@
+"use strict";
 //Explore Express middleware
 
 var fs = require('fs'); //filesystem
@@ -123,7 +124,7 @@ app.get('/give', function (req, res) {
 });
 
 app.post('/login', function(req, res){
-    db.getUser(req.body.username, req.body.password).then(()=>{
+    db.validate(req.body.username, req.body.password).then(()=>{
         req.session.auth = true;
         req.session.username = req.body.username;
         res.send("success");
