@@ -1,3 +1,11 @@
+/*
+	Browser Requirements: (I'm choosing to support Chrome/FireFox only for now)
+	Chrome:
+		Enable: Experimental Extension APIs in chrome://flags
+	Firefox:
+		Shouldn't need any extras, I had disabled some flags for privacy-enhancement which prevented RTC from working. These had to be returned to default.
+*/
+
 var peerConnectionConfig = {
     'iceServers': [
         {'urls': 'stun:stun.services.mozilla.com'},
@@ -9,7 +17,7 @@ var CommunicationServer = function(){
 	var _this = this;
 	console.log("CommunicationServer created.");
 	this.peerConnection;
-	this.serverConnection = new WebSocket('wss://' + window.location.hostname + ':3000');
+	this.serverConnection = new WebSocket('wss://' + window.location.hostname + ':443');
     this.serverConnection.onmessage = (message)=>{
     	console.log(message);
     	var signal = JSON.parse(message.data);
@@ -117,11 +125,11 @@ function awaitCall(){ //PC1
         audio: false,
     };
 
-    server.awaitPeerConnection().then(()=>{
-    	console.log("Try to get media device");
-		navigator.mediaDevices.getUserMedia(constraints).then((stream)=>{
+    console.log("Trying to get media device");
+    navigator.mediaDevices.getUserMedia(constraints).then((stream)=>{
+    	document.getElementById('remoteVideo').src = window.URL.createObjectURL(stream);
+    	server.awaitPeerConnection().then(()=>{
 			peerConnection.addStream(stream);
-			document.getElementById('remoteVideo').src = window.URL.createObjectURL(stream);
 			peerConnection.createOffer().then((description)=>{
 				peerConnection.setLocalDescription(description).then(()=>{
 					server.sendDescription(description);
@@ -130,8 +138,8 @@ function awaitCall(){ //PC1
 					}).catch((error)=>{console.log(error);});
 				}).catch(setLocalDescriptionError);
 			}).catch( createOfferError );
-		}).catch((error)=>{console.log(error);});
-	});
+		});
+	}).catch((error)=>{console.log(error);});
 }
 
 function setStreamDisplay(stream){

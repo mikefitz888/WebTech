@@ -1,5 +1,5 @@
 (function(){
-    function itself(server, sessionParser, gotIceCandidate, gotSessionDescription, sendCommunicationData){
+    function itself(server, sessionParser){
         const HTTPS_PORT = 8443;
 
         const fs = require('fs');
@@ -16,7 +16,7 @@
         // ----------------------------------------------------------------------------------------
 
         // Create a server for the client html page
-        var handleRequest = function(request, response) {
+        /*var handleRequest = function(request, response) {
             // Render the single client html file for any request the HTTP server receives
             console.log('request received: ' + request.url);
 
@@ -30,7 +30,7 @@
         };
 
         var httpsServer = https.createServer(serverConfig, handleRequest);
-        httpsServer.listen(HTTPS_PORT, '0.0.0.0');
+        httpsServer.listen(HTTPS_PORT, '0.0.0.0');*/
 
         // ----------------------------------------------------------------------------------------
 

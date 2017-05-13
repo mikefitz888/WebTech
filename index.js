@@ -12,11 +12,8 @@ var dot = require('dot');
 dot.templateSettings.strip = false;
 dot.process({path: "./views"});
 
-var file = "site.db";
-var exists = fs.existsSync(file);
-var sqlite3 = require("sqlite3").verbose();
-var db = new sqlite3.Database(file);
 var output = new Object();
+var db = require("./DBWrapper");
 
 var app = express();
 
@@ -126,7 +123,14 @@ app.get('/give', function (req, res) {
 });
 
 app.post('/login', function(req, res){
-	db.serialize(function(){
+	db.getUser(req.body.username, req.body.password).then(()=>{
+		req.session.auth = true;
+		req.session.username = req.body.username;
+		res.send("success");
+	}).catch((error)=>{
+		res.send(error);
+	});
+	/*db.serialize(function(){
 		db.get("SELECT id FROM users WHERE username = ? AND password = ?", req.body.username, req.body.password, function(err, row){
 			if(row){
 				req.session.auth = true;
@@ -136,7 +140,7 @@ app.post('/login', function(req, res){
 				res.send("failure"); //Failure
 			}
 		});
-	});
+	});*/
 });
 
 app.get('/requests', function(req, res){
@@ -150,10 +154,10 @@ app.get('/logout', function(req, res){
 });
 
 app.get('/dbsetup', function(req, res){
-	db.serialize(function(){
+	//db.serialize(function(){
 		//db.run("CREATE TABLE users (id INTEGER PRIMARY KEY, username VARCHAR(10), password VARCHAR(10))");
 		//db.run("INSERT INTO users (username, password) VALUES ('admin', 'salty')");
-	});
+	//});
 	res.send("success");
 });
 
@@ -163,11 +167,11 @@ var options = {
 	requestCert: false,
 	rejectUnauthorized: false
 };
-var server = https.createServer(options, app).listen(3000, '0.0.0.0', function(){
-	console.log("Server started at port 3000");
+var server = https.createServer(options, app).listen(443, '0.0.0.0', function(){
+	console.log("Server started at port 443");
 });
 
-var communication_list = new Object();
+/*var communication_list = new Object();
 var CommunicationData = function(){
 	this.IceCandidates = [];
 	this.SessionDescription;
@@ -188,6 +192,6 @@ function sendCommunicationData(username){
 		IceCandidates: communication_list[username].IceCandidates,
 		SessionDescription: communication_list[username].SessionDescription
 	});
-}
+}*/
 
-require('./signalling')(server, sessionParser, recieveIceCandidate, recieveSessionDescription, sendCommunicationData);
+require('./signalling')(server, sessionParser);
