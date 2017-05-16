@@ -28,6 +28,7 @@
                 this.partner;
 
                 ws.on('message', (message)=>{
+                    console.log(message);
                     var m = JSON.parse(message); // message = {event: event, message: [args...]}
                     this.emit.apply(this, [m.event].concat(m.message)); //This should emulate this.emit(event, arg1, arg2...)
                 });
@@ -102,11 +103,11 @@
                 UserEventHandlers[ws.upgradeReq.session.username] = new UserEventHandler(ws);
             });
 
-            ws.on('message', function(message) {
+            /*ws.on('message', function(message) {
                 //if(!session.auth) return false; //Ignore unauthorized users
                 var m = JSON.parse(message);
 
-                /*if(m.type == "create_connection"){
+                if(m.type == "create_connection"){
                     pairings[session.username] = m.partner;
                     pairings[m.partner] = session.username;
                     socketMap[pairings[session.username]].send(JSON.stringify({
@@ -135,14 +136,14 @@
 
                 if(m.type == "request_communication"){
                     ws.send(sendCommunicationData(m.message));
-                }*/
+                }
 
 
                 // Log requests
                 console.log('received: %s', message);
                 //wss.broadcast(message);
                 
-            });
+            });*/
 
             ws.on('close', function(){
                 delete socketMap[session.username];

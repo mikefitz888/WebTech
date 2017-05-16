@@ -108,7 +108,7 @@ CommunicationServer.prototype.ready = function(){
 function createPeerConnection(server){
     var peerConnection = new RTCPeerConnection(peerConnectionConfig);
     server.peerConnection = peerConnection;
-    peerConnection.onicecandidate = server.sendICECandidate;
+    peerConnection.onicecandidate = server.sendICECandidate.bind(server); //Need to bind here, otherwise 'this' comes from the caller
     return peerConnection;
 }
 
@@ -118,10 +118,7 @@ function sendCall(){ //PC2
     //onaddstream is deprecated, use ontrack instead
     peerConnection.onaddstream = setStreamDisplay;
     server.ready().then(()=> {
-        server.send(JSON.stringify({
-            event: 'requestPeerConnection',
-            message: ['admin']
-        }));
+        server.send('requestPeerConnection', ['admin']);
         server.recieveDescription().then((description)=> {
             peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch((error)=>{console.log(error);});
             peerConnection.createAnswer().then((description)=> {
