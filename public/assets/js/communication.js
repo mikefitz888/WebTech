@@ -4,8 +4,9 @@
         Enable: Experimental Extension APIs in chrome://flags
     Firefox:
         Shouldn't need any extras, I had disabled some flags for privacy-enhancement which prevented RTC from working. These had to be returned to default.
+        The Screensharing whitelist is no longer needed to share your screen or windows starting Firefox 52 (April).
+        If using earlier version, add localhost to media.getusermedia.screensharing.allowed_domains in about:config
 */
-
 var peerConnectionConfig = {
     'iceServers': [
         {'urls': 'stun:stun.services.mozilla.com'},
@@ -13,8 +14,14 @@ var peerConnectionConfig = {
     ]
 };
 
+/*
+    Messages to and from the server take the following format:
+    {event: string, message: [args]}
+*/
 var CommunicationServer = function(){
     var _this = this;
+    this.event_list = {};
+
     console.log("CommunicationServer created.");
     this.peerConnection;
     this.serverConnection = new WebSocket('wss://' + window.location.hostname + ':443');
@@ -22,84 +29,98 @@ var CommunicationServer = function(){
         console.log(message);
         var signal = JSON.parse(message.data);
         console.log(signal);
-        _this[signal.type](signal.message);
+
+        if(this.event_list.hasOwnProperty(signal.event)) {
+            _this.event_list[signal.event].apply(this, signal.message || []); //Prevent packet with no message from causing error
+        } else {
+            console.log("No event specified for " + signal.event);
+        }
     };
 
-    this.descriptionHandle = null;
-    this.ICECandidateHandle = null;
-    this.peerConnectionHandle = null;
+    //this.send = function(message){_this.serverConnection.send(message);}
 
-    this.send = function(message){_this.serverConnection.send(message);}
+    this.on('ICECandidate', (candidate)=>{
+        console.log(candidate);
+        if (!candidate) return; // A 'NULL' candidate represents end of candidate stream
+        this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate) ).then(()=> {
+            console.log("Added Ice Candidate");
+        }).catch((error)=> {
+            console.log(error);
+        });
+    });
 }
 
-CommunicationServer.prototype.sendICECandidate = function(IceCandidate){
-    console.log("ICE Candidate sent.");
-    this.send(JSON.stringify({
-        type: "ice_candidate",
-        message: IceCandidate.candidate
+/*
+    Server communication methods.
+*/
+
+CommunicationServer.prototype.on = function(event, callback){
+    if(this.event_list.hasOwnProperty(event)) console.log("Overwriting callback: " + event);
+    else console.log("Adding callback: " + event);
+    this.event_list[event] = callback;
+}
+
+CommunicationServer.prototype.send = function(event, message=[]){
+    this.serverConnection.send(JSON.stringify({
+        event: event,
+        message: message
     }));
 }
 
-CommunicationServer.prototype.recieveICECandidate = function(candidate){
-    console.log(candidate);
-    if (!candidate) return;
-    this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate) ).then(()=> {
-        console.log("Added Ice Candidate");
-    }).catch((error)=> {
-        console.log(error);
-    });
+/*
+    Promise-based server interface methods.
+*/
+
+CommunicationServer.prototype.sendICECandidate = function(IceCandidate){
+    console.log("ICE Candidate sent.");
+    this.send("ownICECandidate", IceCandidate.candidate);
 }
 
 CommunicationServer.prototype.sendDescription = function(localDescription){
     console.log("Send Description");
-    this.send(JSON.stringify({
-        type: "session_description",
-        message: localDescription
-    }));
+    this.send("ownSessionDescription", localDescription);
 }
 
 CommunicationServer.prototype.recieveDescription = function(){
-    var _this = this;
     return new Promise((resolve, reject)=> {
-        _this.descriptionHandle = function(description) {
+        this.on("sessionDescription", (description)=>{
             console.log("Description recieved.");
             resolve(description);
-        }
+        });
     });
 }
 
 CommunicationServer.prototype.awaitPeerConnection = function(){
-    var _this = this;
     return new Promise((resolve, reject)=> {
-        _this.peerConnectionHandle = function() {
+        this.on("peerConnection", ()=>{
             console.log("Peer Connected");
             resolve();
-        }
+        });
     });
 }
 
 CommunicationServer.prototype.ready = function(){
-    var _this = this;
     return new Promise((resolve, reject)=> {
-        _this.serverConnection.onopen = resolve;
+        this.serverConnection.onopen = resolve;
     });
 }
 
 function createPeerConnection(server){
     var peerConnection = new RTCPeerConnection(peerConnectionConfig);
     server.peerConnection = peerConnection;
-    peerConnection.onicecandidate = function(evt){server.sendICECandidate(evt);};
+    peerConnection.onicecandidate = server.sendICECandidate;
     return peerConnection;
 }
 
 function sendCall(){ //PC2
     var server = new CommunicationServer();
     var peerConnection = createPeerConnection(server);
+    //onaddstream is deprecated, use ontrack instead
     peerConnection.onaddstream = setStreamDisplay;
     server.ready().then(()=> {
         server.send(JSON.stringify({
-            type: 'create_connection',
-            partner: 'admin'
+            event: 'requestPeerConnection',
+            message: ['admin']
         }));
         server.recieveDescription().then((description)=> {
             peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch((error)=>{console.log(error);});
