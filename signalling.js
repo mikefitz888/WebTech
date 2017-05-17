@@ -95,58 +95,10 @@
             var session;
             sessionParser(ws.upgradeReq, {}, function(){
                 console.log("New websocket connection");
-                session = ws.upgradeReq.session;
-
-                socketMap[session.username] = ws;
-                console.log("Socket mapped for " + session.username);
-
                 UserEventHandlers[ws.upgradeReq.session.username] = new UserEventHandler(ws);
             });
 
-            /*ws.on('message', function(message) {
-                //if(!session.auth) return false; //Ignore unauthorized users
-                var m = JSON.parse(message);
-
-                if(m.type == "create_connection"){
-                    pairings[session.username] = m.partner;
-                    pairings[m.partner] = session.username;
-                    socketMap[pairings[session.username]].send(JSON.stringify({
-                        type: 'peerConnection',
-                        message: 'none'
-                    }));
-                }
-
-
-                if(m.type == "ice_candidate"){
-                    //gotIceCandidate.call(session, m.message);
-                    socketMap[pairings[session.username]].send(JSON.stringify({
-                        type: 'recieveICECandidate',
-                        message: m.message
-                    }));
-                }
-
-
-                if(m.type == "session_description"){
-                    //gotSessionDescription.call(session, m.message);
-                    socketMap[pairings[session.username]].send(JSON.stringify({
-                        type: 'descriptionHandle',
-                        message: m.message
-                    }));
-                }
-
-                if(m.type == "request_communication"){
-                    ws.send(sendCommunicationData(m.message));
-                }
-
-
-                // Log requests
-                console.log('received: %s', message);
-                //wss.broadcast(message);
-                
-            });*/
-
             ws.on('close', function(){
-                delete socketMap[session.username];
                 console.log("CLOSING");
                 console.log(session);
             });
