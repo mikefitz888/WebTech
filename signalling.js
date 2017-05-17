@@ -4,6 +4,7 @@
         const HTTPS_PORT = 8443;
 
         const fs = require('fs');
+        const EventEmitter = require('events');
         const https = require('https');
         const WebSocket = require('ws');
         const WebSocketServer = WebSocket.Server;
@@ -15,28 +16,73 @@
         };
 
         // ----------------------------------------------------------------------------------------
+        // Create a server for handling websocket calls
+        var wss = new WebSocketServer({server: server});
 
-        // Create a server for the client html page
-        /*var handleRequest = function(request, response) {
-            // Render the single client html file for any request the HTTP server receives
-            console.log('request received: ' + request.url);
+        // WebSocket Message Handler (per user)
+        var UserEventHandlers = {};
+        class UserEventHandler extends EventEmitter {
+            constructor(ws) {
+                super();
 
-            if(request.url === '/') {
-                response.writeHead(200, {'Content-Type': 'text/html'});
-                response.end(fs.readFileSync('public/client_demo.html'));
-            } else if(request.url === '/webrtc.js') {
-                response.writeHead(200, {'Content-Type': 'application/javascript'});
-                response.end(fs.readFileSync('public/webrtc.js'));
+                this.partner;
+
+                ws.on('message', (message)=>{
+                    console.log(message);
+                    var m = JSON.parse(message); // message = {event: event, message: [args...]}
+                    this.emit.apply(this, [m.event].concat(m.message)); //This should emulate this.emit(event, arg1, arg2...)
+                });
+
+                // Self triggered events
+                this.on('ownSessionDescription', (description)=>{
+                    if(this.partner) {
+                        this.partner.emit('otherSessionDescription', description);
+                    } else {
+                        console.error("[ERROR!] " + ws.upgradeReq.session.username + " has no partner.");
+                    }
+                });
+
+                this.on('requestPeerConnection', (peer)=>{
+                    this.partner = UserEventHandlers[peer];
+                    this.partner.partner = this;
+                    this.partner.emit('peerConnection');
+                });
+
+                this.on('ownICECandidate', (candidate)=>{
+                    if(this.partner) {
+                        this.partner.emit('otherICECandidate', candidate);
+                    } else {
+                        console.error("[ERROR!] " + ws.upgradeReq.session.username + " has no partner.");
+                    }
+                });
+
+                // Partner triggered events
+                this.on('otherICECandidate', (candidate)=>{
+                    ws.send(JSON.stringify({
+                        event: 'ICECandidate',
+                        message: [candidate]
+                    }));
+                });
+
+                this.on('otherSessionDescription', (description)=>{
+                    ws.send(JSON.stringify({
+                        event: 'sessionDescription',
+                        message: [description]
+                    }));
+                });
+
+                this.on('peerConnection', ()=>{
+                    ws.send(JSON.stringify({
+                        event: 'peerConnection'
+                        //message not specified to test client-side robustness (+ no message is needed here)
+                    }));
+                });
             }
-        };
-
-        var httpsServer = https.createServer(serverConfig, handleRequest);
-        httpsServer.listen(HTTPS_PORT, '0.0.0.0');*/
+        }
 
         // ----------------------------------------------------------------------------------------
 
-        // Create a server for handling websocket calls
-        var wss = new WebSocketServer({server: server});
+        
 
         var pairings = new Object();
         pairings = {
@@ -49,56 +95,11 @@
             var session;
             sessionParser(ws.upgradeReq, {}, function(){
                 console.log("New websocket connection");
-                session = ws.upgradeReq.session;
-
-                socketMap[session.username] = ws;
-                console.log("Socket mapped for " + session.username);
-            });
-
-            ws.on('message', function(message) {
-                //if(!session.auth) return false; //Ignore unauthorized users
-                var m = JSON.parse(message);
-
-                if(m.type == "create_connection"){
-                    pairings[session.username] = m.partner;
-                    pairings[m.partner] = session.username;
-                    socketMap[pairings[session.username]].send(JSON.stringify({
-                        type: 'peerConnectionHandle',
-                        message: 'none'
-                    }));
-                }
-
-
-                if(m.type == "ice_candidate"){
-                    //gotIceCandidate.call(session, m.message);
-                    socketMap[pairings[session.username]].send(JSON.stringify({
-                        type: 'recieveICECandidate',
-                        message: m.message
-                    }));
-                }
-
-
-                if(m.type == "session_description"){
-                    //gotSessionDescription.call(session, m.message);
-                    socketMap[pairings[session.username]].send(JSON.stringify({
-                        type: 'descriptionHandle',
-                        message: m.message
-                    }));
-                }
-
-                if(m.type == "request_communication"){
-                    ws.send(sendCommunicationData(m.message));
-                }
-
-
-                // Log requests
-                console.log('received: %s', message);
-                //wss.broadcast(message);
+                UserEventHandlers[ws.upgradeReq.session.username] = new UserEventHandler(ws);
 
             });
 
             ws.on('close', function(){
-                delete socketMap[session.username];
                 console.log("CLOSING");
                 console.log(session);
             });

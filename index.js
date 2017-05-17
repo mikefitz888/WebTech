@@ -1,5 +1,10 @@
 "use strict";
 //Explore Express middleware
+"use strict";
+
+var sjcl = require("sjcl");
+//console.log(JSON.stringify(sjcl, null, 4));
+console.log({frog:56});
 
 var fs = require('fs'); //filesystem
 var https = require('https');
