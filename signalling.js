@@ -96,6 +96,7 @@
             sessionParser(ws.upgradeReq, {}, function(){
                 console.log("New websocket connection");
                 UserEventHandlers[ws.upgradeReq.session.username] = new UserEventHandler(ws);
+
             });
 
             ws.on('close', function(){

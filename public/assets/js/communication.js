@@ -1,3 +1,4 @@
+"use strict";
 /*
     Browser Requirements: (I'm choosing to support Chrome/FireFox only for now)
     Chrome:
