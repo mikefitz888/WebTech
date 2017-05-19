@@ -133,17 +133,6 @@ app.post('/login', function(req, res){
     }).catch((error)=>{
         res.send(error);
     });
-    /*db.serialize(function(){
-        db.get("SELECT id FROM users WHERE username = ? AND password = ?", req.body.username, req.body.password, function(err, row){
-            if(row){
-                req.session.auth = true;
-                req.session.username = req.body.username;
-                res.send("success"); //Successful
-            }else{
-                res.send("failure"); //Failure
-            }
-        });
-    });*/
 });
 
 app.get('/requests', function(req, res){
