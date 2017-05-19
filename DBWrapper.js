@@ -6,6 +6,8 @@
     var file = "site.db";
     var exists = fs.existsSync(file);
     var sqlite3 = require("sqlite3").verbose();
+    // Additional salt which ensures that if the database is stolen, there is still an unknown hash available
+    var pepper = "055F5207C6EE27F0A34BF22EB846D3A2CDB7C31C37A7C97F906A2E0C9D805631"
 
     var DBClass = function(){
         /* Database Settings */
@@ -24,7 +26,7 @@
 
     var hashPassword = function(password, salt)
     {
-        return crypto.hash.sha256.hash(salt + password).map(toHex).join("")
+        return crypto.hash.sha256.hash(salt + password + pepper).map(toHex).join("")
     }
 
     var validatePassword = function(password, hash, salt)
