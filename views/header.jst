@@ -17,6 +17,13 @@
         $(".login").show();
       });
 
+      $("#login-form input[type='button']").on("click", function(e){
+        //$(".login").hide();
+        //$("#login-form span[type='errormsg']").addClass("error hidden");
+        // Or...
+        window.location.reload();
+      });
+
       $("#login-form form").submit(function(e){
         $.ajax({
                  type: "POST",
@@ -28,7 +35,7 @@
                        window.location.reload();
                      }else{
                        // The user entered an invalid Username or Password
-                       $("#login-form span").removeClass("error hidden");
+                       $("#login-form span[type='errormsg']").removeClass("error hidden");
                     }
                 }
             });
@@ -323,6 +330,11 @@
         margin-top:20px;
       }
 
+      #login-form [type="button"]{
+        margin-top:20px;
+        float:right;
+      }
+
       .login_button {
         display: block;
         width: 100%;
@@ -386,6 +398,7 @@
           <input name="password" type="password" />
         </span><br />
         <input type="submit" value="Login" />
+        <input type="button" value="Cancel"/>
       </form>
     </div>
     <header id="top_menu">
