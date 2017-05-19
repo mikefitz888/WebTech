@@ -52,7 +52,7 @@
             {
                 this.db.get("SELECT password, salt FROM users WHERE username = ?", username, (err, row) =>
                 {
-                    if (validatePassword(password, row.password, row.salt))
+                    if (row && validatePassword(password, row.password, row.salt))
                     {
                         console.log("Password verified");
                         resolve();
