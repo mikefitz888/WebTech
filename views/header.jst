@@ -18,10 +18,10 @@
       });
 
       $("#login-form input[type='button']").on("click", function(e){
-        //$(".login").hide();
-        //$("#login-form span[type='errormsg']").addClass("error hidden");
-        // Or...
-        window.location.reload();
+        $(".login").hide();
+        $("#login-form span[type='errormsg']").addClass("error hidden");
+        $("#login-box-user").val("");
+        $("#login-box-pass").val("");
       });
 
       $("#login-form form").submit(function(e){
@@ -390,12 +390,12 @@
         <span class="error hidden" type="errormsg"><em>Incorrect username + password combination.</em></span>
         <span>
           <label for="username">Username</label><br />
-          <input name="username" type="input" />
+          <input id="login-box-user" name="username" type="input" />
         </span>
 
         <span>
           <label for="password">Password</label><br />
-          <input name="password" type="password" />
+          <input id="login-box-pass" name="password" type="password" />
         </span><br />
         <input type="submit" value="Login" />
         <input type="button" value="Cancel"/>

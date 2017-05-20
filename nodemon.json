@@ -1,0 +1,7 @@
+{
+  "restartable": "rs",
+  "ignore": ["views/header.js", "views/aid.js", "views/base.js", "views/footer.js", "views/index.js", "views/login.js"],
+  "ext": "jst",
+  "watch": ["*.*"],
+  "verbose": true
+}

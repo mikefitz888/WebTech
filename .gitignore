@@ -49,3 +49,6 @@ jspm_packages
 # dotenv environment variables file
 .env
 
+# Compiled js files from jst
+views/*.js
+
