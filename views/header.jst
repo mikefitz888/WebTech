@@ -15,32 +15,68 @@
 
       $(".login_button").on("click", function(e){
         $(".login").show();
+        $("#login-tab").click();
       });
 
-      $("#login-form input[type='button']").on("click", function(e){
+      $("#loginregister-form input[type='button']").on("click", function(e){
         $(".login").hide();
-        $("#login-form span[type='errormsg']").addClass("error hidden");
+        $("#loginregister-form span[type='errormsg']").addClass("error hidden");
         $("#login-box-user").val("");
         $("#login-box-pass").val("");
       });
 
-      $("#login-form form").submit(function(e){
+      $("#login-tab").on("click", function(e){
+        $("#login-form").show();
+        $("#register-form").hide();
+        $("#register-tab").removeClass("active");
+        $("#login-tab").addClass("active");
+      });
+
+      $("#register-tab").on("click", function(e){
+        $("#login-form").hide();
+        $("#register-form").show();
+        $("#login-tab").removeClass("active");
+        $("#register-tab").addClass("active");
+      });
+
+      $("#login-form").submit(function(e){
         $.ajax({
                  type: "POST",
                  url: "/login",
-                 data: $("#login-form form").serialize(), // serializes the form's elements.
+                 data: $("#login-form").serialize(), // serializes the form's elements.
                  success: function(data)
                  {
                      if(data == "success"){
                        window.location.reload();
                      }else{
                        // The user entered an invalid Username or Password
-                       $("#login-form span[type='errormsg']").removeClass("error hidden");
+                       $("#login-error").removeClass("error hidden");
                     }
                 }
             });
 
           e.preventDefault();
+      });
+
+      $("#register-form").submit(function(e) {
+        $.ajax({
+                 type: "POST",
+                 url: "/register",
+                 data: $("#register-form").serialize(),
+                 success: function(data)
+                 {
+                    if (data == "success") {
+                      window.location.reload();
+                    } else if (data == "username fault") {
+                      $("#register-error-username").removeClass("error hidden");
+                      $("#register-error-password").addClass("error hidden");
+                    } else { // password fault
+                      $("#register-error-password").removeClass("error hidden");
+                      $("#register-error-username").addClass("error hidden");
+                    }
+                }
+            });
+        e.preventDefault();
       });
     });
     </script>
@@ -91,6 +127,7 @@
       ul.horizontal_menu li {
         display: inline-block;
         height: 50px;
+        cursor: pointer;
       }
 
       ul.horizontal_menu li:hover {
@@ -292,7 +329,7 @@
         display: none;
       }
 
-      #login-dark-fade {
+      #loginregister-dark-fade {
         position:fixed;
         left:0;
         top:0;
@@ -303,7 +340,7 @@
         z-index: 1;
       }
 
-      #login-form {
+      #loginregister-form {
         z-index: 2;
         position: fixed;
         width:400px;
@@ -317,7 +354,7 @@
         border-radius: 10px;
       }
 
-      #login-form span:not([type="errormsg"]) {
+      #loginregister-form span:not([type="errormsg"]) {
         width:50%;
         float:left;
       }
@@ -326,11 +363,11 @@
         display: none;
       }
 
-      #login-form [type="submit"]{
+      #loginregister-form [type="submit"]{
         margin-top:20px;
       }
 
-      #login-form [type="button"]{
+      #loginregister-form [type="button"]{
         margin-top:20px;
         float:right;
       }
@@ -376,6 +413,19 @@
         font-size:80px;
       }
 
+      .loginregister-tab {
+        width:49%;
+        display: inline-block;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .padded-form-field {
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+
       br { /*clearfix*/
         clear: both;
       }
@@ -383,23 +433,63 @@
     <!--<script src="https://cdn.webrtc-experiment.com/getScreenId.js"> </script>-->
   </head>
   <body>
-    <div id="login-dark-fade" class="login"></div>
-    <div id="login-form" class="login">
-      <form action="/login" method="post">
-        <h3>Login</h3>
-        <span class="error hidden" type="errormsg"><em>Incorrect username + password combination.</em></span>
-        <span>
-          <label for="username">Username</label><br />
-          <input id="login-box-user" name="username" type="input" />
-        </span>
-
-        <span>
-          <label for="password">Password</label><br />
-          <input id="login-box-pass" name="password" type="password" />
-        </span><br />
-        <input type="submit" value="Login" />
-        <input type="button" value="Cancel"/>
-      </form>
+    <div id="loginregister-dark-fade" class="login"></div>
+    <div id="loginregister-form" class="login">
+        <ul class="horizontal_menu">
+          <li id="login-tab" class="loginregister-tab">LOGIN</li>
+          <li id="register-tab" class="loginregister-tab">REGISTER</li>
+        </ul></br>
+        <!-- LOGIN FORM -->
+        <form id="login-form">
+          <span class="error hidden" id="login-error" type="errormsg"><em>Incorrect username + password combination.</em></span>
+          <span class="padded-form-field">
+            <label for="username">Username</label><br />
+            <input id="login-box-user" name="username" type="input" />
+          </span>
+          <span class="padded-form-field">
+            <label for="password">Password</label><br />
+            <input id="login-box-pass" name="password" type="password" />
+          </span><br />
+          <input type="submit" value="Login" />
+          <input type="button" value="Cancel"/>
+        </form>
+        <!-- REGISTRATION FORM -->
+        <!-- TODO: Bank details (AccNum, SortCode) && Email Address -->
+        <form id="register-form">
+          <span class="error hidden" id="register-error-username" type="errormsg"><em>Username already taken. Please choose another.</em></span>
+          <span class="error hidden" id="register-error-password" type="errormsg"><em>Passwords don't match. Please re-enter both again.</em></span>
+          <span class="padded-form-field">
+            <label for="username">Username</label><br />
+            <input name="username" type="text"/>
+          </span>
+          <span class="padded-form-field">
+            <label for="role">What do you want to do?</label><br/>
+            <select name="role">
+              <option value="user">I need help</option>
+              <option value="helper">I want to help</option>
+              <option value="both">Both</option>
+            </select>
+          </span><br/>
+          <span class="padded-form-field">
+            <label for="name">Fullname</label><br />
+            <input name="name" type="input" />
+          </span>
+          <span class="padded-form-field">
+            <label for="given_name">Preferred Name</label><br />
+            <input name="given_name" type="input" />
+          </span><br/>
+          <span class="padded-form-field">
+            <label for="password">Password</label>
+            <input name="password" type="password" />
+          </span>
+          <span class="padded-form-field">
+            <label for="confirm_password">Confirm Password</label><br/>
+            <input name="confirm_password" type="password" />
+          </span>
+          <input type="submit" value="Register" />
+          <input type="reset"/>
+          <input type="button" value="Cancel"/>
+        </form>
     </div>
     <header id="top_menu">
       <ul class="horizontal_menu" id="menu_list">

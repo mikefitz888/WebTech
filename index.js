@@ -135,6 +135,18 @@ app.post('/login', function(req, res){
     });
 });
 
+app.post('/register', function(req, res){
+    // further checks, fields should not be left empty for instance
+    if (req.body.password != req.body.confirm_password) res.send("password fault");
+    else db.register(req.body).then(()=>{
+        req.session.auth = true;
+        req.session.username = req.body.username;
+        res.send("success");
+    }).catch((error)=>{
+        res.send(error);
+    });
+});
+
 app.get('/requests', function(req, res){
     console.log(output);
     res.send("check log");

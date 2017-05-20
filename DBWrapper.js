@@ -69,15 +69,17 @@
         });
     }
 
-    DBClass.prototype.register = function(username, password)
+    DBClass.prototype.register = function(form)
     {
+        var username = form.username.toLowerCase();
+        var password = form.password;
         return new Promise((resolve, reject)=>
         {
             this.db.serialize(() =>
             {
                 this.db.get("SELECT id FROM users WHERE username = ?", username, (err, row) =>
                 {
-                    if (row) reject("Username already taken");
+                    if (row) reject("username fault");
                     else
                     {
                         var salt = getSecureSalt();
