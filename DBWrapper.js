@@ -73,6 +73,25 @@
     {
         var username = form.username.toLowerCase();
         var password = form.password;
+        var fullname = form.name;
+        var givenname = form.given_name;
+        var role;
+        console.log(form.role);
+        switch (form.role)
+        {
+            case "user":
+                console.log("user!");
+                rule = 1;
+                break;
+            case "helper":
+                console.log("Helper!");
+                role = 2;
+                break;
+            case "both":
+                console.log("user and helper!");
+                role = 3;
+                break;
+        }
         return new Promise((resolve, reject)=>
         {
             this.db.serialize(() =>
@@ -84,8 +103,20 @@
                     {
                         var salt = getSecureSalt();
                         var hash = hashPassword(password, salt);
-                        this.db.run("INSERT INTO users (\"username\", \"password\", \"salt\") VALUES (?, ?, ?)", username, hash, salt);
-                        resolve();
+                        this.db.serialize(() =>
+                        {
+                            this.db.run("BEGIN");
+                            this.db.run("CREATE TEMPORARY TABLE IF NOT EXISTS ti_users(new_id INTEGER)");
+                            this.db.run("DELETE FROM ti_users");
+                            this.db.run("INSERT INTO users (\"username\", \"password\", \"salt\") VALUES (?, ?, ?)", username, hash, salt);
+                            this.db.run("INSERT INTO ti_users (\"new_id\") VALUES (last_insert_rowid())");
+                            this.db.run("INSERT INTO users_fullname (\"userid\", \"fullname\") SELECT new_id, ? FROM ti_users", fullname);
+                            this.db.run("INSERT INTO users_givenname (\"userid\", \"givenname\") SELECT new_id, ? FROM ti_users", givenname);
+                            if (role & 1) this.db.run("INSERT INTO users_role (\"userid\", \"roleid\") SELECT new_id, 1 FROM ti_users");
+                            if (role & 2) this.db.run("INSERT INTO users_role (\"userid\", \"roleid\") SELECT new_id, 2 FROM ti_users");
+                            this.db.run("COMMIT");
+                            resolve();
+                        });
                     }
                 });
             });
