@@ -89,8 +89,15 @@ app.use('/assets/fonts/fontawesome-webfont.woff2', express.static( path.join(__d
     .otf - application/x-font-opentype
 */
 
+/*
+    Middleware
+*/
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use((req, res, next)=>{ //DEBUGGING: Recompile templates each pageload
+    dot.process({path: "./views"});
+    next();
+});
 
 //Template engine for controlling variable content in webpages. Usage: res.render('name', {title:'blah', message:'blah', ...});
 app.engine('js', function(filePath, options, callback){

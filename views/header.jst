@@ -500,7 +500,8 @@
       <span class="settings">
         <span class="settings-wrapper">
           {{? it.auth }}
-          {{=it.username}}<a href="/logout">logout</a>
+          Welcome {{=it.username}}! <br />
+          <a href="/logout">Logout<i class="fa fa-sign-out" aria-hidden="true"></i></a>
           {{??}}
           <a href="#" class="login_button">Login / Register</a>
           {{?}}
