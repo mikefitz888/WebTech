@@ -26,15 +26,17 @@
       });
 
       $("#login-tab").on("click", function(e){
-        $("#login-form").show();
         $("#register-form").hide();
+        //$("#login-form").show();
+        $("#login-form").fadeIn(500, function() {});
         $("#register-tab").removeClass("active");
         $("#login-tab").addClass("active");
       });
 
       $("#register-tab").on("click", function(e){
         $("#login-form").hide();
-        $("#register-form").show();
+        //$("#register-form").show();
+        $("#register-form").fadeIn(500, function() {});
         $("#login-tab").removeClass("active");
         $("#register-tab").addClass("active");
       });
