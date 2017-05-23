@@ -8,49 +8,49 @@
     <script type="text/javascript">
     //navigator.geolocation
     //var battery = navigator.battery || navigator.webkitBattery || navigator.mozBattery;
-    $(function(){
-      $("#side_panel_right .info-panel-sub").on("click", function(e){
+    $(() => {
+      $("#side_panel_right .info-panel-sub").on("click", e => {
         //Do stuff
       });
 
-      $(".login_button").on("click", function(e){
+      $(".login_button").on("click", e => {
         $(".login").show();
         $("#login-tab").click();
       });
 
-      $("#loginregister-form input[type='button']").on("click", function(e){
+      $("#loginregister-form input[type='button']").on("click", e => {
         $(".login").hide();
         $("#loginregister-form span[type='errormsg']").addClass("error hidden");
         $("#login-box-user").val("");
         $("#login-box-pass").val("");
       });
 
-      $("#login-tab").on("click", function(e){
+      $("#login-tab").on("click", e => {
         $("#register-form").hide();
         //$("#login-form").show();
-        $("#login-form").fadeIn(500, function() {});
+        $("#login-form").fadeIn(500, () => {});
         $("#register-tab").removeClass("active");
         $("#login-tab").addClass("active");
       });
 
-      $("#register-tab").on("click", function(e){
+      $("#register-tab").on("click", e => {
         $("#login-form").hide();
         //$("#register-form").show();
-        $("#register-form").fadeIn(500, function() {});
+        $("#register-form").fadeIn(500, () => {});
         $("#login-tab").removeClass("active");
         $("#register-tab").addClass("active");
       });
 
-      $("#login-form").submit(function(e){
+      $("#login-form").submit(e => {
         $.ajax({
                  type: "POST",
                  url: "/login",
                  data: $("#login-form").serialize(), // serializes the form's elements.
-                 success: function(data)
+                 success: data =>
                  {
-                     if(data == "success"){
+                     if (data == "success") {
                        window.location.reload();
-                     }else{
+                     } else {
                        // The user entered an invalid Username or Password
                        $("#login-error").removeClass("error hidden");
                     }
@@ -60,12 +60,12 @@
           e.preventDefault();
       });
 
-      $("#register-form").submit(function(e) {
+      $("#register-form").submit(e => {
         $.ajax({
                  type: "POST",
                  url: "/register",
                  data: $("#register-form").serialize(),
-                 success: function(data)
+                 success: data =>
                  {
                     if (data == "success") {
                       window.location.reload();

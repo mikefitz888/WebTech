@@ -34,7 +34,7 @@ app.use(sessionParser);
 app.disable('x-powered-by'); //Prevent targetted attacks
 
 //Custom authentication middleware
-var auth = function(req, res, next){
+var auth = (req, res, next) => {
     if (req.session && req.session.auth == true) {
         return next();
     } else {
@@ -42,7 +42,7 @@ var auth = function(req, res, next){
     }
 };
 
-var sessionShare = function(req, res, next){
+var sessionShare = (req, res, next) => {
     console.log("sharingSession");
     res.locals.session = req.session;
     next();
@@ -61,7 +61,7 @@ function options(MIME_type) { //Header options for static files
     return {
         dotfiles: "ignore",
         //etag: '...', //This should change iff content has changed to help with caching, e.g. hash of content/mod date
-        setHeaders: function(res, path, stat){
+        setHeaders: (res, path, stat) => {
             res.set('Content-Type', MIME_type);
             generalHeaders(res, path, stat);
         }
@@ -94,13 +94,13 @@ app.use('/assets/fonts/fontawesome-webfont.woff2', express.static( path.join(__d
 */
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use((req, res, next)=>{ //DEBUGGING: Recompile templates each pageload
+app.use((req, res, next) => { //DEBUGGING: Recompile templates each pageload
     dot.process({path: "./views"});
     next();
 });
 
 //Template engine for controlling variable content in webpages. Usage: res.render('name', {title:'blah', message:'blah', ...});
-app.engine('js', function(filePath, options, callback){
+app.engine('js', (filePath, options, callback) => {
     var header = require('./views/header');
     var render = require(filePath.substring(0, filePath.length - 3));
     var output = header({auth: options.session.auth, username: options.session.username || "Anonymous"}) + render(options);
@@ -111,11 +111,11 @@ app.set('views', './views'); //Specify directory containing view templates
 app.set('view engine', 'js');
 
 //Take care of routing
-app.get('/', sessionShare, function(req, res){
+app.get('/', sessionShare, (req, res) => {
     res.render('index', {target: "/get", auth: req.session.auth});
 });
 
-app.get('/find', function (req, res) {
+app.get('/find', (req, res) => {
     //res.send('/.*fly$/')
     //res.sendFile('base.html', options);
     req.session.auth = true;
@@ -124,7 +124,7 @@ app.get('/find', function (req, res) {
     res.render('base', {target: "/get", session: req.session});
 });
 
-app.get('/give', function (req, res) {
+app.get('/give', (req, res) => {
     //res.send('/.*fly$/')
     //res.sendFile('base.html', options);
     req.session.auth = true;
@@ -132,8 +132,8 @@ app.get('/give', function (req, res) {
     res.render('aid', {target: "/aid", session: req.session});
 });
 
-app.post('/login', function(req, res){
-    db.validate(req.body.username, req.body.password).then(()=>{
+app.post('/login', (req, res) => {
+    db.validate(req.body.username, req.body.password).then(() => {
         req.session.auth = true;
         req.session.username = req.body.username;
         res.send("success");
@@ -142,7 +142,7 @@ app.post('/login', function(req, res){
     });
 });
 
-app.post('/register', function(req, res){
+app.post('/register', (req, res) => {
     if (req.body.username == "" || req.body.name == "") {
         res.send("field fault");
         return;
@@ -165,17 +165,17 @@ app.post('/register', function(req, res){
     });
 });
 
-app.get('/requests', function(req, res){
+app.get('/requests', (req, res) => {
     console.log(output);
     res.send("check log");
 });
 
-app.get('/logout', function(req, res){
+app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect("/");
 });
 
-app.get('/dbsetup', function(req, res){
+app.get('/dbsetup', (req, res) => {
     //db.serialize(function(){
         //db.run("CREATE TABLE users (id INTEGER PRIMARY KEY, username VARCHAR(10), password VARCHAR(10))");
         //db.run("INSERT INTO users (username, password) VALUES ('admin', 'salty')");
@@ -190,7 +190,7 @@ var options = {
     rejectUnauthorized: false
 };
 
-var server = https.createServer(options, app).listen(443, '0.0.0.0', function(){
+var server = https.createServer(options, app).listen(443, '0.0.0.0', () => {
     console.log("Server started at port 443");
 });
 

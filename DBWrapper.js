@@ -1,5 +1,5 @@
 "use strict";
-(function(){
+(() => {
     /* Pre-Requisites */
     var fs = require('fs');
     var crypto = require("sjcl");
