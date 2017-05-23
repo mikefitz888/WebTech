@@ -70,11 +70,18 @@
                     if (data == "success") {
                       window.location.reload();
                     } else if (data == "username fault") {
+                      $("#register-form span[type=errormsg]").addClass("error hidden");
                       $("#register-error-username").removeClass("error hidden");
-                      $("#register-error-password").addClass("error hidden");
-                    } else { // password fault
+                    } else if (data == "field fault") {
+                      $("#register-form span[type=errormsg]").addClass("error hidden");
+                      $("#register-error-field").removeClass("error hidden");
+                    } else if (data == "match fault") {
+                      $("#register-form span[type=errormsg]").addClass("error hidden");
+                      $("#register-error-match").removeClass("error hidden");
+                    }
+                    else { // password fault
+                      $("#register-form span[type=errormsg]").addClass("error hidden");
                       $("#register-error-password").removeClass("error hidden");
-                      $("#register-error-username").addClass("error hidden");
                     }
                 }
             });
@@ -459,7 +466,9 @@
         <!-- TODO: Bank details (AccNum, SortCode) && Email Address -->
         <form id="register-form">
           <span class="error hidden" id="register-error-username" type="errormsg"><em>Username already taken. Please choose another.</em></span>
-          <span class="error hidden" id="register-error-password" type="errormsg"><em>Passwords don't match. Please re-enter both again.</em></span>
+          <span class="error hidden" id="register-error-match" type="errormsg"><em>Passwords don't match. Please re-enter both again.</em></span>
+          <span class="error hidden" id="register-error-password" type="errormsg"><em>Passwords must be at least 10 characters long.</em></span>
+          <span class="error hidden" id="register-error-field" type="errormsg"><em>A field has not been filled in.</em></span>
           <span class="padded-form-field">
             <label for="username">Username</label><br />
             <input name="username" type="text"/>
@@ -477,7 +486,7 @@
             <input name="name" type="input" />
           </span>
           <span class="padded-form-field">
-            <label for="given_name">Preferred Name</label><br />
+            <label for="given_name">Preferred Name (Optional)</label><br />
             <input name="given_name" type="input" />
           </span><br/>
           <span class="padded-form-field">

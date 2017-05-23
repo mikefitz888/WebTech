@@ -143,8 +143,19 @@ app.post('/login', function(req, res){
 });
 
 app.post('/register', function(req, res){
-    // further checks, fields should not be left empty for instance
-    if (req.body.password != req.body.confirm_password) res.send("password fault");
+    if (req.body.username == "" || req.body.name == "") {
+        res.send("field fault");
+        return;
+    }
+    if (req.body.password.length < 10) {
+        res.send("password fault");
+        return;
+    }
+    if (req.body.password != req.body.confirm_password)
+    {
+        res.send("match fault");
+        return;
+    }
     else db.register(req.body).then(()=>{
         req.session.auth = true;
         req.session.username = req.body.username;

@@ -76,19 +76,15 @@
         var fullname = form.name;
         var givenname = form.given_name;
         var role;
-        console.log(form.role);
         switch (form.role)
         {
             case "user":
-                console.log("user!");
-                rule = 1;
+                role = 1;
                 break;
             case "helper":
-                console.log("Helper!");
                 role = 2;
                 break;
             case "both":
-                console.log("user and helper!");
                 role = 3;
                 break;
         }
