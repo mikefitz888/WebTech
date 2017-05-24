@@ -75,6 +75,8 @@
         var password = form.password;
         var fullname = form.name;
         var givenname = form.given_name;
+        var accountno = form.account_number;
+        var sortcode = form.sort_code;
         var role;
         switch (form.role)
         {
@@ -109,7 +111,11 @@
                             this.db.run("INSERT INTO users_fullname (\"userid\", \"fullname\") SELECT new_id, ? FROM ti_users", fullname);
                             if (givenname != "") this.db.run("INSERT INTO users_givenname (\"userid\", \"givenname\") SELECT new_id, ? FROM ti_users", givenname);
                             if (role & 1) this.db.run("INSERT INTO users_role (\"userid\", \"roleid\") SELECT new_id, 1 FROM ti_users");
-                            if (role & 2) this.db.run("INSERT INTO users_role (\"userid\", \"roleid\") SELECT new_id, 2 FROM ti_users");
+                            if (role & 2)
+                            {
+                                this.db.run("INSERT INTO users_role (\"userid\", \"roleid\") SELECT new_id, 2 FROM ti_users");
+                                this.db.run("INSERT INTO users_bankdetails (\"userid\", \"accountno\", \"sortcode\") SELECT new_id, ?, ? FROM ti_users", accountno, sortcode);
+                            }
                             this.db.run("COMMIT");
                             resolve();
                         });
