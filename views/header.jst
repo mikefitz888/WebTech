@@ -38,10 +38,12 @@
         {
           case "user":
             console.log("hiding bank details");
+            $("#register-form span[type='bank-details']").hide();
             break;
           case "helper":
           case "both":
             console.log("showing bank details");
+            $("#register-form span[type='bank-details']").fadeIn(500, () => {});
             break;
         }
       }
@@ -163,6 +165,15 @@
           <span class="padded-form-field">
             <label for="confirm_password">Confirm Password</label><br/>
             <input name="confirm_password" type="password" />
+          </span>
+          <span type="bank-details">You've selected a helper role, please give us your bank details so we can pay you.</span>
+          <span class="padded-form-field" type="bank-details">
+            <label for="account_number">Account Number</label><br/>
+            <input name="account_number" type="input" />
+          </span>
+          <span class="padded-form-field" type="bank-details">
+            <label for="sort_code">Sort Code</label><br/>
+            <input name="sort_code" type="input" />
           </span>
           <input type="submit" value="Register" />
           <input type="reset"/>
