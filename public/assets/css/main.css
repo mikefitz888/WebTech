@@ -1,0 +1,355 @@
+/* NOTES:
+  The CSS here uses some features that aren't compatible with all browsers. Due to the nature of
+  our application it make sense for us to only target current Firefox and Chrome releases. Edge/IE11
+  should still work, or at least partial support is provided. (flex boxes)
+*/
+/*CSS RESET (because browsers can be inconsitent)*/
+html, body, div {
+  margin:0;
+  padding:0;
+  border:0;
+  font-size: 100%;
+  font:inherit;
+  vertical-align: baseline;
+  line-height:1;
+}
+
+html, body {
+  height:100%;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-flow: column;
+  font-family: "Proxima Nova","Helvetica Neue",Helvetica,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
+/*MENU*/
+header {
+  flex: 0 1 auto;
+}
+
+ul.horizontal_menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #222;
+  line-height: 25px;
+}
+
+ul.horizontal_menu li {
+  display: inline-block;
+  height: 50px;
+  cursor: pointer;
+}
+
+ul.horizontal_menu li:hover {
+  border-bottom: 4px #00a2d9 solid;
+}
+
+ul.horizontal_menu li.active {
+  border-bottom: 4px #00a2d9 solid;
+}
+
+ul.horizontal_menu li a {
+  display: inline-block;
+  color: #fff;
+  text-align: center;
+  padding: 14px 20px;
+  text-decoration: none;
+}
+
+#top_menu {
+  width:100%;
+  background-color: #222;
+  /*height:50px;*/
+  flex: 0 0 50px;
+}
+
+#top_menu ul#menu_list {
+  min-width: 500px;
+  height: 100%;
+}
+
+/*CONTENT*/
+#content_container, #top_menu {
+  display: flex;
+  flex-flow: row;
+}
+
+#content_container {
+  flex: 1 1 auto;
+}
+
+#top_menu .settings, #side_panel_right {
+  flex: 1 1 200px;
+}
+
+#menu_list, #render_video {
+  flex: 1 1 70%;
+}
+
+/*FOOTER*/
+footer {
+  display: none;
+  flex: 0 1 auto;
+  text-align: center;
+  background: #444;
+}
+
+/*VIDEO AREA*/
+#render_video {
+  background-color: #000;
+}
+
+/* CSS3 Animations */
+@keyframes pulse {
+  0% {
+    color: default;
+  }
+  100% {
+    color: #00a2d9;
+  }
+}
+
+@keyframes darken {
+  0% {
+    background-color: default;
+  }
+  100% {
+    background-color: #222;
+  }
+}
+
+/*SIDE PANEL*/
+#side_panel_right {
+  background-color: #333;
+  color: #adadad;
+}
+
+#side_panel_right .info-panel-sub p {
+  padding-left: 12px;
+  display: none;
+}
+
+#side_panel_right .info-panel-sub.active p {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+#side_panel_right .info-panel-sub h2 {
+  font-weight: 300;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin: 0;
+  padding: 16px 0;
+  border-bottom: 2px solid #222;
+}
+
+#side_panel_right .info-panel-sub.active h2 {
+  color: #fff;
+  border-right: 12px solid #00a2d9;
+  background-color: #222;
+}
+
+#side_panel_right .info-panel-sub h2 i {
+  padding: 0 10px;
+  width: 30px;
+  text-align: center;
+}
+
+#side_panel_right .info-panel-sub.active h2 i {
+  color: #00a2d9;
+}
+
+#side_panel_right .info-panel-sub h2:hover i {
+  padding: 0 10px;
+  animation: 0.7s 1 forwards pulse;
+}
+
+#side_panel_right .info-panel-sub h2:hover {
+  animation: 0.7s 1 forwards darken;
+}
+
+/* Panel Information */
+.info-section {
+  font-size:13px;
+  display: block;
+  border-bottom: 2px solid #222;
+  padding-bottom: 6px;
+}
+
+.info-title {
+  float:left;
+  line-height: 16px;
+  padding: 1px 10px;
+  margin-bottom: 6px;
+  color: #222;
+  font-weight: bold;
+  background: #00a2d9;
+  position: relative;
+}
+
+.info-title:after {
+  content: "";
+  border-top: 18px solid #00a2d9;
+  border-right: 18px solid transparent;
+  position: absolute;
+  right:-18px;
+  top:0px;
+}
+
+.info-section span:nth-of-type(2) {
+  clear:left;
+}
+
+.info-name {
+  text-align: right;
+  width:50%;
+  display: inline-block;
+}
+
+.info-name:after {
+  content: ":";
+}
+
+.info-entry {
+  width:50%;
+  text-align: center;
+}
+
+.info-element {
+  float:left;
+  width: 50%;
+}
+
+.info-section:after {
+  content: "";
+    display: table;
+    clear:both;
+}
+
+.settings .settings-wrapper {
+  border:1px solid #00a2d9;
+  margin:5px;
+  display: block;
+  height: 42px;
+}
+
+.hidden {
+  visibility: hidden;
+  display: none;
+}
+
+#loginregister-dark-fade {
+  position:fixed;
+  left:0;
+  top:0;
+  height: 100%;
+  width: 100%;
+  background: #000;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+#loginregister-form {
+  z-index: 2;
+  position: fixed;
+  width:400px;
+  color: #fff;
+  padding: 20px;
+  background: #222;
+  left: 50%;
+  top:50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #00a2d9;
+  border-radius: 10px;
+}
+
+#loginregister-form span:not([type="errormsg"]) {
+  width:50%;
+  float:left;
+}
+
+.login {
+  display: none;
+}
+
+#loginregister-form [type="submit"]{
+  margin-top:20px;
+}
+
+#loginregister-form [type="button"]{
+  margin-top:20px;
+  float:right;
+}
+
+.login_button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: rgb(0, 162, 217) none repeat scroll 0% 0%;
+  line-height: 42px;
+  text-decoration: none;
+  text-align: center;
+  text-decoration: none;
+  color:#fff;
+}
+
+.feature {
+  width:80%;
+  min-width: 800px;
+  display: flex;
+  margin: 20px auto;
+}
+
+.feature h1, .feature hr { 
+  font-size:145px;
+  margin: 0; 
+}
+
+hr {
+  width: 100%;
+}
+
+#subcontent {
+  background-color: #222;
+  width:100%;
+}
+
+.user-option {
+  text-align: center;
+  flex: 1 1 auto;
+  background: #222;
+  color: #fff;
+  border: 4px solid #00a2d9;
+  border-radius: 10px;
+  width:200px;
+  text-decoration: none;
+  margin: 0 20px;
+  padding: 25px 0;
+}
+
+.user-option .fa {
+  font-size:80px;
+}
+
+.loginregister-tab {
+  width:49%;
+  display: inline-block;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+}
+
+.padded-form-field {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+br { /*clearfix*/
+  clear: both;
+}
