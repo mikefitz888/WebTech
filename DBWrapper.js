@@ -107,7 +107,7 @@
                             this.db.run("INSERT INTO users (\"username\", \"password\", \"salt\") VALUES (?, ?, ?)", username, hash, salt);
                             this.db.run("INSERT INTO ti_users (\"new_id\") VALUES (last_insert_rowid())");
                             this.db.run("INSERT INTO users_fullname (\"userid\", \"fullname\") SELECT new_id, ? FROM ti_users", fullname);
-                            this.db.run("INSERT INTO users_givenname (\"userid\", \"givenname\") SELECT new_id, ? FROM ti_users", givenname);
+                            if (givenname != "") this.db.run("INSERT INTO users_givenname (\"userid\", \"givenname\") SELECT new_id, ? FROM ti_users", givenname);
                             if (role & 1) this.db.run("INSERT INTO users_role (\"userid\", \"roleid\") SELECT new_id, 1 FROM ti_users");
                             if (role & 2) this.db.run("INSERT INTO users_role (\"userid\", \"roleid\") SELECT new_id, 2 FROM ti_users");
                             this.db.run("COMMIT");

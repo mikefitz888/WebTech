@@ -143,7 +143,9 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-    if (req.body.username == "" || req.body.name == "") {
+    if (req.body.username == "" || req.body.name == ""
+     || (req.body.role != "user"
+     && (req.body.bank_details == "" || req.body.sort_code == ""))) {
         res.send("field fault");
         return;
     }

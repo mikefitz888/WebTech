@@ -33,16 +33,13 @@
       });
 
       var displayBank = function() {
-        // TODO: Let's get this done :)
         switch ($("#roleselect").val())
         {
           case "user":
-            console.log("hiding bank details");
             $("#register-form span[type='bank-details']").hide();
             break;
           case "helper":
           case "both":
-            console.log("showing bank details");
             $("#register-form span[type='bank-details']").fadeIn(500, () => {});
             break;
         }
@@ -479,7 +476,6 @@
           <input type="button" value="Cancel"/>
         </form>
         <!-- REGISTRATION FORM -->
-        <!-- TODO: Bank details (AccNum, SortCode) && Email Address -->
         <form id="register-form">
           <span class="error hidden" id="register-error-username" type="errormsg"><em>Username already taken. Please choose another.</em></span>
           <span class="error hidden" id="register-error-match" type="errormsg"><em>Passwords don't match. Please re-enter both again.</em></span>
