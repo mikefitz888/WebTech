@@ -15,9 +15,14 @@
 
 
 
-      $(".login_button").on("click", e => {
+      $(".login_button, .login-expose").on("click", e => {
         $(".login").show();
         $("#login-tab").click();
+      });
+
+      $(".register-expose").on("click", e => {
+        $(".login").show();
+        $("#register-tab").click();
       });
 
       $("#loginregister-dark-fade").on("click", e => {
@@ -184,10 +189,15 @@
       <span class="settings">
         <span class="settings-wrapper">
           {{? it.auth }}
-          Welcome {{=it.username}}! <br />
-          <a href="/logout">Logout<i class="fa fa-sign-out" aria-hidden="true"></i></a>
+          <a href="#" class="tr-button"><i class="fa fa-chevron-down" aria-hidden="true"></i>&nbsp;Welcome {{=it.username}}!&nbsp;<i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+          <div class="user-menu">
+            <ul>
+              <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Settings</a></li>
+              <li><a href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Logout</a></li>
+            </ul>
+          </div>
           {{??}}
-          <a href="#" class="login_button">Login / Register</a>
+          <a href="#" class="tr-button login_button">Login / Register</a>
           {{?}}
         </span>
       </span>

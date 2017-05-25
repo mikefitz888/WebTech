@@ -323,7 +323,7 @@ footer {
   border-color: #00a2d9;
 }
 
-.login_button {
+.tr-button {
   display: block;
   width: 100%;
   height: 100%;
@@ -333,6 +333,37 @@ footer {
   text-align: center;
   text-decoration: none;
   color:#fff;
+}
+
+.user-menu {
+  position: relative;
+  z-index: 99;
+  width:100%;
+  left: -1px;
+}
+
+.user-menu ul {
+  list-style-type: none;
+  padding:0;
+  margin: 0;
+}
+
+.user-menu li {
+  background: #00a2d9;
+  border-left:2px solid #fff;
+  color: #fff;
+  margin-top: 4px;
+  margin-right: -2px;
+}
+
+.user-menu a {
+  line-height: 42px;
+  display: block;
+  width:100%;
+  height:100%;
+  color: #fff;
+  text-decoration: none;
+  text-indent: 10px;
 }
 
 .feature {

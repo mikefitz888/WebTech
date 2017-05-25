@@ -112,6 +112,8 @@ app.set('view engine', 'js');
 
 //Take care of routing
 app.get('/', sessionShare, (req, res) => {
+    req.session.auth = true;
+    req.session.username = "admin";
     res.render('index', {target: "/get", auth: req.session.auth});
 });
 
