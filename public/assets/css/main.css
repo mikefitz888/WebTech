@@ -41,6 +41,7 @@ ul.horizontal_menu {
 
 ul.horizontal_menu li {
   display: inline-block;
+  border-bottom: 4px transparent solid;
   height: 50px;
   cursor: pointer;
 }
@@ -264,27 +265,62 @@ footer {
   background: #222;
   left: 50%;
   top:50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); /*Causing a bottom-border bug*/
   border: 1px solid #00a2d9;
   border-radius: 10px;
 }
 
-#loginregister-form span:not([type="errormsg"]) {
-  width:50%;
+#loginregister-form span.half {
+  width:48%;
   float:left;
+}
+
+#loginregister-form span.half.right {
+  margin-left: 4%;
 }
 
 .login {
   display: none;
 }
 
-#loginregister-form [type="submit"]{
-  margin-top:20px;
+#loginregister-form li {
+  transition: all 0.5s ease;
 }
 
-#loginregister-form [type="button"]{
+#loginregister-form .form-submit {
+  border: none;
+  background: #00a2d9;
+  color: #fff;
+  width: 100%;
+  padding: 15px 0;
+  line-height: 32px;
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 3.2px;
   margin-top:20px;
-  float:right;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  font-family: sans-serif;
+}
+
+#loginregister-form .form-submit:hover {
+  background: #0082a9;
+}
+
+#loginregister-form .form-entry {
+  background: none;
+  border: 1px solid #ccc;
+  transition: border-color .25s ease, box-shadow .25s ease;
+  font-size:22px;
+  padding: 5px 10px;
+  width:100%;
+  height:100%;
+  box-sizing: border-box;
+  color: #fff;
+}
+
+#loginregister-form .form-entry:focus {
+  border-color: #00a2d9;
 }
 
 .login_button {
@@ -309,6 +345,17 @@ footer {
 .feature h1, .feature hr { 
   font-size:145px;
   margin: 0; 
+}
+
+.feature a {
+  color: #00a2d9;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+h2.center {
+  margin: 0 auto;
+  text-align: center;
 }
 
 hr {
@@ -348,6 +395,15 @@ hr {
 .padded-form-field {
   padding-top: 5px;
   padding-bottom: 5px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+#bank-details {
+  display: block;
+  text-align: center;
+  font-size: 22px;
+  margin: 0px 0px 10px;
 }
 
 br { /*clearfix*/

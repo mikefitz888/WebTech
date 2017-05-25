@@ -13,12 +13,14 @@
         //Do stuff
       });
 
+
+
       $(".login_button").on("click", e => {
         $(".login").show();
         $("#login-tab").click();
       });
 
-      $("#loginregister-form input[type='button']").on("click", e => {
+      $("#loginregister-dark-fade").on("click", e => {
         $(".login").hide();
         $("#loginregister-form span[type='errormsg']").addClass("error hidden");
         $("#login-box-user").val("");
@@ -117,16 +119,15 @@
         <!-- LOGIN FORM -->
         <form id="login-form">
           <span class="error hidden" id="login-error" type="errormsg"><em>Incorrect username + password combination.</em></span>
-          <span class="padded-form-field">
+          <span class="padded-form-field half">
             <label for="username">Username</label><br />
-            <input id="login-box-user" name="username" type="input" />
+            <input class="form-entry" id="login-box-user" name="username" type="input" />
           </span>
-          <span class="padded-form-field">
+          <span class="padded-form-field half right">
             <label for="password">Password</label><br />
-            <input id="login-box-pass" name="password" type="password" />
+            <input class="form-entry" id="login-box-pass" name="password" type="password" />
           </span><br />
-          <input type="submit" value="Login" />
-          <input type="button" value="Cancel"/>
+          <input class="form-submit" type="submit" value="Login" />
         </form>
         <!-- REGISTRATION FORM -->
         <form id="register-form">
@@ -134,46 +135,44 @@
           <span class="error hidden" id="register-error-match" type="errormsg"><em>Passwords don't match. Please re-enter both again.</em></span>
           <span class="error hidden" id="register-error-password" type="errormsg"><em>Passwords must be at least 10 characters long.</em></span>
           <span class="error hidden" id="register-error-field" type="errormsg"><em>A field has not been filled in.</em></span>
-          <span class="padded-form-field">
+          <span class="padded-form-field half">
             <label for="username">Username</label><br />
-            <input name="username" type="text"/>
+            <input class="form-entry" name="username" type="text"/>
           </span>
-          <span class="padded-form-field">
+          <span class="padded-form-field half right">
             <label for="role">What do you want to do?</label><br/>
-            <select id="roleselect" name="role">
+            <select class="form-entry" id="roleselect" name="role">
               <option value="user">I need help</option>
               <option value="helper">I want to help</option>
               <option value="both">Both</option>
             </select>
           </span><br/>
-          <span class="padded-form-field">
+          <span class="padded-form-field half">
             <label for="name">Fullname</label><br />
-            <input name="name" type="input" />
+            <input class="form-entry" name="name" type="input" />
           </span>
-          <span class="padded-form-field">
+          <span class="padded-form-field half right">
             <label for="given_name">Preferred Name (Optional)</label><br />
-            <input name="given_name" type="input" />
+            <input class="form-entry" name="given_name" type="input" />
           </span><br/>
-          <span class="padded-form-field">
+          <span class="padded-form-field half">
             <label for="password">Password</label>
-            <input name="password" type="password" />
+            <input class="form-entry" name="password" type="password" />
           </span>
-          <span class="padded-form-field">
+          <span class="padded-form-field half right">
             <label for="confirm_password">Confirm Password</label><br/>
-            <input name="confirm_password" type="password" />
+            <input class="form-entry" name="confirm_password" type="password" />
           </span>
-          <span type="bank-details">You've selected a helper role, please give us your bank details so we can pay you.</span>
-          <span class="padded-form-field" type="bank-details">
+          <span id="bank-details" type="bank-details">Helper Payment Details</span>
+          <span class="padded-form-field half" type="bank-details">
             <label for="account_number">Account Number</label><br/>
-            <input name="account_number" type="input" />
+            <input class="form-entry" name="account_number" type="input" />
           </span>
-          <span class="padded-form-field" type="bank-details">
+          <span class="padded-form-field half right" type="bank-details">
             <label for="sort_code">Sort Code</label><br/>
-            <input name="sort_code" type="input" />
+            <input class="form-entry" name="sort_code" type="input" />
           </span>
-          <input type="submit" value="Register" />
-          <input type="reset"/>
-          <input type="button" value="Cancel"/>
+          <input class="form-submit" type="submit" value="Register" />
         </form>
     </div>
     <header id="top_menu">
