@@ -197,8 +197,10 @@
     <header id="top_menu">
       <ul class="horizontal_menu" id="menu_list">
         <li{{? it.page == 'home'}} class="active"{{?}}><a href="/">HOME</a></li>
-        {{? it.auth }}
+        {{? it.authu }}
         <li{{? it.page == 'find'}} class="active"{{?}}><a href="/find">FIND HELP</a></li>
+        {{?}}
+        {{? it.authh }}
         <li{{? it.page == 'give'}} class="active"{{?}}><a href="/give">GIVE HELP</a></li>
         {{?}}
       </ul>

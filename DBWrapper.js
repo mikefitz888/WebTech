@@ -57,7 +57,12 @@
                     if (row && validatePassword(password, row.password, row.salt))
                     {
                         console.log("Password verified");
-                        resolve();
+                        this.db.all("SELECT roleid FROM users_role WHERE userid IN (SELECT id FROM users WHERE username = ?)", username.toLowerCase(), (err, rows) =>
+                        {
+                            var role = 0;
+                            rows.forEach(row2 => { role |= row2.roleid; });
+                            resolve(role);;
+                        });
                     }
                     else
                     {

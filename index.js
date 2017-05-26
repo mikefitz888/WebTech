@@ -101,7 +101,7 @@ app.engine('js', (filePath, options, callback) => {
     var header = require('./views/header');
     var render = require(filePath.substring(0, filePath.length - 3));
 
-    var output = header({auth: options.session.auth, username: options.session.username || "Anonymous", name: options.session.name || "Anonymous", page: options.page}) + render(options);
+    var output = header({auth: options.session.auth, authh: options.session.authh, authu: options.session.authu, username: options.session.username || "Anonymous", name: options.session.name || "Anonymous", page: options.page}) + render(options);
     console.log(UserEventHandlers);
     return callback(null, output);
 });
@@ -115,7 +115,7 @@ app.get('/', sessionShare, (req, res) => {
     //req.session.username = "admin";
     //req.session.name = "admin";
     console.log(req.session);
-    res.render('index', {target: "/get", session: req.session, auth: req.session.auth, page:'home'});
+    res.render('index', {target: "/get", session: req.session, auth: req.session.auth, authh: req.session.authh, authu: req.session.authu, page:'home'});
 });
 
 app.get('/find', (req, res) => {
@@ -145,8 +145,10 @@ app.get('/give', (req, res) => {
 
 app.post('/login', (req, res) => {
     console.log(req.session);
-    db.validate(req.body.username, req.body.password).then(() => {
+    db.validate(req.body.username, req.body.password).then(role => {
         req.session.auth = true;
+        req.session.authh = role != 1 && role > 0;
+        req.session.authu = role != 2 && role > 0;
         req.session.username = req.body.username;
         db.getName(req.body.username.toLowerCase()).then(name =>
         {
@@ -183,6 +185,8 @@ app.post('/register', (req, res) => {
     }
     else db.register(req.body).then(()=>{
         req.session.auth = true;
+        req.session.authh = req.body.role != "user";
+        req.session.authu = req.body.role != "helper";
         req.session.username = req.body.username;
         req.session.name = req.body.given_name != "" ? req.body.given_name : req.body.name;
         res.send("success");
