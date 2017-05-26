@@ -139,7 +139,7 @@ app.get('/give', (req, res) => {
     }
     console.log("Users");
     console.log(users);
-    res.render('aid', {target: "/aid", session: req.session, help:users});
+    res.render('aid', {target: "/aid", session: req.session, help:users, count: users.length});
 });
 
 app.post('/login', (req, res) => {

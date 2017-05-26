@@ -26,6 +26,7 @@
 
 		$('#request_form').submit(e => {
 			$('#request_form .form-submit').prop("value", "Choose A Window");
+			information_packet.category = $("#request_form select option:selected").text();
 			awaitCall(information_packet); //Perhaps pass options from here
 			e.preventDefault();
 		});

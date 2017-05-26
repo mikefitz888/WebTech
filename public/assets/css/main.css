@@ -475,3 +475,7 @@ br { /*clearfix*/
   width:50%;
   margin:0 auto;
 }
+
+#request_form h3 {
+  color: #fff;
+}

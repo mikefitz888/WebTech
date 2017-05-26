@@ -26,7 +26,7 @@
 
                 this.partner;
                 this.help_request = true;
-                this.displayed_description = "Lorem Ipsum"
+                this.displayed_description = ' - ' + username;
                 this.username = username;
                 this.info_packet;
 
@@ -47,6 +47,7 @@
 
                 this.on('infoPacket', (info_packet)=>{
                     this.info_packet = info_packet;
+                    this.displayed_description = info_packet.category + ' - ' + this.username;
                 });
 
                 this.on('requestPeerConnection', (peer)=>{

@@ -7,6 +7,9 @@
 				{{~it.help :value:index}}
 					<input class="form-submit" type="button" name="joblist" id="j1" value="{{=value.displayed_description}}" onclick="sendCall('{{=value.username}}');" />
 				{{~}}
+				{{? it.count === 0}}
+					<h3>No Jobs Currently Available.</h3>
+				{{?}}
 			</form>
 		</div>
 		<div class="loading">
