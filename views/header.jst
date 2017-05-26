@@ -196,9 +196,9 @@
     </div>
     <header id="top_menu">
       <ul class="horizontal_menu" id="menu_list">
-        <li class="active"><a href="/">HOME</a></li>
-        <li><a href="/find">FIND HELP</a></li>
-        <li><a href="/give">GIVE HELP</a></li>
+        <li{{? it.page == 'home'}} class="active"{{?}}><a href="/">HOME</a></li>
+        <li{{? it.page == 'find'}} class="active"{{?}}><a href="/find">FIND HELP</a></li>
+        <li{{? it.page == 'give'}} class="active"{{?}}><a href="/give">GIVE HELP</a></li>
       </ul>
       <span class="settings">
         <span class="settings-wrapper">
@@ -206,7 +206,7 @@
           <a href="#" class="tr-button expand-menu"><i class="fa fa-chevron-down" aria-hidden="true"></i>&nbsp;Welcome {{=it.name}}!&nbsp;<i class="fa fa-chevron-down" aria-hidden="true"></i></a>
           <div class="user-menu">
             <ul>
-              <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Settings</a></li>
+              <!--<li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Settings</a></li>-->
               <li><a href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Logout</a></li>
             </ul>
           </div>

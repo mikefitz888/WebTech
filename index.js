@@ -101,7 +101,7 @@ app.engine('js', (filePath, options, callback) => {
     var header = require('./views/header');
     var render = require(filePath.substring(0, filePath.length - 3));
 
-    var output = header({auth: options.session.auth, username: options.session.username || "Anonymous", name: options.session.name || "Anonymous"}) + render(options);
+    var output = header({auth: options.session.auth, username: options.session.username || "Anonymous", name: options.session.name || "Anonymous", page: options.page}) + render(options);
     console.log(UserEventHandlers);
     return callback(null, output);
 });
@@ -114,7 +114,7 @@ app.get('/', sessionShare, (req, res) => {
     req.session.auth = true;
     req.session.username = "admin";
     req.session.name = "admin";
-    res.render('index', {target: "/get", auth: req.session.auth});
+    res.render('index', {target: "/get", auth: req.session.auth, page:'home'});
 });
 
 app.get('/find', (req, res) => {
@@ -124,7 +124,7 @@ app.get('/find', (req, res) => {
     req.session.username = "admin";
     req.session.name = "admin";
     //console.log(req.session);
-    res.render('base', {target: "/get", session: req.session});
+    res.render('base', {target: "/get", session: req.session, page:'find'});
 });
 
 app.get('/give', (req, res) => {
@@ -139,7 +139,7 @@ app.get('/give', (req, res) => {
     }
     console.log("Users");
     console.log(users);
-    res.render('aid', {target: "/aid", session: req.session, help:users, count: users.length});
+    res.render('aid', {target: "/aid", session: req.session, help:users, count: users.length, page:'give'});
 });
 
 app.post('/login', (req, res) => {

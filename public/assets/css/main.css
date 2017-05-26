@@ -479,3 +479,7 @@ br { /*clearfix*/
 #request_form h3 {
   color: #fff;
 }
+
+.logo {
+  margin: 0 auto;
+}
