@@ -92,18 +92,17 @@ app.use('/assets/fonts/fontawesome-webfont.woff2', express.static( path.join(__d
 /*
     Middleware
 */
+let UserEventHandlers = new Object();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use((req, res, next) => { //DEBUGGING: Recompile templates each pageload
-    dot.process({path: "./views"});
-    next();
-});
 
 //Template engine for controlling variable content in webpages. Usage: res.render('name', {title:'blah', message:'blah', ...});
 app.engine('js', (filePath, options, callback) => {
     var header = require('./views/header');
     var render = require(filePath.substring(0, filePath.length - 3));
+
     var output = header({auth: options.session.auth, username: options.session.username || "Anonymous"}) + render(options);
+    console.log(UserEventHandlers);
     return callback(null, output);
 });
 
@@ -131,7 +130,13 @@ app.get('/give', (req, res) => {
     //res.sendFile('base.html', options);
     req.session.auth = true;
     req.session.username = "helper";
-    res.render('aid', {target: "/aid", session: req.session});
+    var users = [];
+    for(var key in UserEventHandlers){
+        if(UserEventHandlers[key].help_request) users.push(UserEventHandlers[key]);
+    }
+    console.log("Users");
+    console.log(users);
+    res.render('aid', {target: "/aid", session: req.session, help:users});
 });
 
 app.post('/login', (req, res) => {
@@ -198,27 +203,4 @@ var server = https.createServer(options, app).listen(443, '0.0.0.0', () => {
     console.log("Server started at port 443");
 });
 
-/*var communication_list = new Object();
-var CommunicationData = function(){
-    this.IceCandidates = [];
-    this.SessionDescription;
-}
-
-function recieveIceCandidate(message){
-    if(!communication_list.hasOwnProperty(this.username)) communication_list[this.username] = new CommunicationData();
-    communication_list[this.username].IceCandidates.push(message);
-}
-
-function recieveSessionDescription(message){
-    if(!communication_list.hasOwnProperty(this.username)) communication_list[this.username] = new CommunicationData();
-    communication_list[this.username].SessionDescription = message;
-}
-
-function sendCommunicationData(username){
-    return JSON.stringify({
-        IceCandidates: communication_list[username].IceCandidates,
-        SessionDescription: communication_list[username].SessionDescription
-    });
-}*/
-
-require('./signalling')(server, sessionParser);
+require('./signalling')(server, sessionParser, UserEventHandlers);

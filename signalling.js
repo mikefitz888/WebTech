@@ -1,7 +1,7 @@
 "use strict";
 (function(){
-    function itself(server, sessionParser){
-        const HTTPS_PORT = 8443;
+    function itself(server, sessionParser, UserEventHandlers){
+        const HTTPS_PORT = 443;
 
         const fs = require('fs');
         const EventEmitter = require('events');
@@ -20,12 +20,14 @@
         var wss = new WebSocketServer({server: server});
 
         // WebSocket Message Handler (per user)
-        var UserEventHandlers = {};
         class UserEventHandler extends EventEmitter {
-            constructor(ws) {
+            constructor(ws, username) {
                 super();
 
                 this.partner;
+                this.help_request = true;
+                this.displayed_description = "Lorem Ipsum"
+                this.username = username;
 
                 ws.on('message', (message)=>{
                     console.log(message);
@@ -43,6 +45,7 @@
                 });
 
                 this.on('requestPeerConnection', (peer)=>{
+                    this.help_request = false;
                     this.partner = UserEventHandlers[peer];
                     this.partner.partner = this;
                     this.partner.emit('peerConnection');
@@ -72,6 +75,7 @@
                 });
 
                 this.on('peerConnection', ()=>{
+                    this.help_request = false; //Peer has connected, no longer needs help
                     ws.send(JSON.stringify({
                         event: 'peerConnection'
                         //message not specified to test client-side robustness (+ no message is needed here)
@@ -82,26 +86,18 @@
 
         // ----------------------------------------------------------------------------------------
 
-        
-
-        var pairings = new Object();
-        pairings = {
-            helper: "admin",
-            admin: "helper"
-        }
-        var socketMap = new Object();
-
         wss.on('connection', function(ws) {
-            var session;
+            var username;
             sessionParser(ws.upgradeReq, {}, function(){
                 console.log("New websocket connection");
-                UserEventHandlers[ws.upgradeReq.session.username] = new UserEventHandler(ws);
+                username = ws.upgradeReq.session.username;
+                UserEventHandlers[ws.upgradeReq.session.username] = new UserEventHandler(ws, username);
 
             });
 
             ws.on('close', function(){
                 console.log("CLOSING");
-                console.log(session);
+                delete UserEventHandlers[username];
             });
         });
 

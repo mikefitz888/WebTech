@@ -1,189 +1,66 @@
+<script type="text/javascript">
+	var listener_enabled = true;
+	$(()=>{
+		$('#request_form').submit(e => {
+			$('#request_form .form-submit').prop("value", "Choose A Window");
+			awaitCall(); //Perhaps pass options from here
+			e.preventDefault();
+		});
+	});
+</script>
 <div id="content_container">
-			<div id="render_video">
-				<video id="remoteVideo" controls autoplay style="width: 100%;height:100%;background-repeat: no-repeat;background-size: 100%;background-image: url(https://lh5.googleusercontent.com/6U-gmL_hG9bbquDZdW_ajiA-1bgkfSlHOkzR24aigkyPQzXWXNoRNfyLjXS3rqV92iwq395JSQ=s640-h400-e365-rw);"></video>
-			</div>
-			<div id="side_panel_right">
-				<input type="button" onclick="awaitCall()" value="Start Call" />
-				<span class="info-panel-sub active">
-					<h2><i class="fa fa-globe" aria-hidden="true"></i>Overview</h2>
-					<p>
-						<span class="info-section">
-							<span class="info-title">Screen #1</span>
-							<span class="info-element">
-								<span class="info-name">Screen Width</span>
-								<span class="info-entry">1920px</span>
-							</span>
-							<span class="info-element">
-								<span class="info-name">Screen Height</span>
-								<span class="info-entry">1080px</span>
-							</span>
-						</span>
-						<span class="info-section">
-							<span class="info-title">Screen #2</span>
-							<span class="info-element">
-								<span class="info-name">Screen Width</span>
-								<span class="info-entry">1920px</span>
-							</span>
-							<span class="info-element">
-								<span class="info-name">Screen Height</span>
-								<span class="info-entry">1080px</span>
-							</span>
-						</span>
-					</p>
-				</span>
-				<span class="info-panel-sub">
-					<h2><i class="fa fa-television" aria-hidden="true"></i>GPU Information</h2>
-					<p>...</p>
-				</span>
-				<span class="info-panel-sub">
-					<h2><i class="fa fa-tachometer" aria-hidden="true"></i>CPU Information</h2>
-					<p>...</p>
-				</span>
-			</div>
+	<div id="render_video">
+		<video id="remoteVideo" controls autoplay></video>
+		<div id="setup-call">
+			<form id="request_form">
+				<h3>What kind of help do you need?</h3>
+				<select class="form-entry" name="help-type">
+					<option value="art">Art</option>
+					<option value="dev">Development</option>
+					<option value="other">Other</option>
+				</select>
+				<input class="form-submit" type="submit" value="Start Call" />
+			</form>
 		</div>
-		<script type="text/javascript">
-		/*var localVideo;
-		var remoteVideo;
-		var peerConnection;
-		window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
-		window.RTCIceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
-		window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
-		var peerConnectionConfig = {'iceServers': [{'url': 'stun:stun.services.mozilla.com'}, {'url': 'stun:stun.l.google.com:19302'}]};
-		
-		function start(isCaller){
-			peerConnection = new RTCPeerConnection(peerConnectionConfig);
-		    peerConnection.onicecandidate = gotIceCandidate;
-		    peerConnection.onaddstream = gotRemoteStream;
-		    peerConnection.addStream(localStream);
-
-		    if(isCaller) {
-		        peerConnection.createOffer(gotDescription, createOfferError);
-		    }
-		}
-
-		function gotDescription(description) {
-		    console.log('got description');
-		    peerConnection.setLocalDescription(description, function () {
-		        serverConnection.send(JSON.stringify({'sdp': description}));
-		    }, function() {console.log('set description error')});
-		}
-
-		function gotIceCandidate(event) {
-		    if(event.candidate != null) {
-		        serverConnection.send(JSON.stringify({'ice': event.candidate}));
-		    }
-		}
-
-		function gotRemoteStream(event) {
-		    console.log('got remote stream');
-		    remoteVideo.src = window.URL.createObjectURL(event.stream);
-		}
-
-		function createOfferError(error) {
-		    console.log(error);
-		}
-
-		function gotMessageFromServer(message) {
-		    if(!peerConnection) start(false);
-
-		    var signal = JSON.parse(message.data);
-		    if(signal.sdp) {
-		        peerConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp), function() {
-		            if(signal.sdp.type == 'offer') {
-		                peerConnection.createAnswer(gotDescription, createAnswerError);
-		            }
-		        });
-		    } else if(signal.ice) {
-		        peerConnection.addIceCandidate(new RTCIceCandidate(signal.ice));
-		    }
-		}
-
-		(function(){
-			serverConnection = new WebSocket('ws://127.0.0.1:3434');
-			var maxTries = 0;
-			function showChromeExtensionStatus() {
-				if(typeof window.getChromeExtensionStatus !== 'function') return;
-				
-				var gotResponse;
-				window.getChromeExtensionStatus(function(status) {
-					gotResponse = true;
-					console.info('getChromeExtensionStatus', status);
-				});
-				
-				maxTries++;
-				if(maxTries > 15) return;
-				setTimeout(function() {
-					if(!gotResponse) showChromeExtensionStatus();
-				}, 1000);
-			}
-			
-			showChromeExtensionStatus();
-			
-            // via: https://bugs.chromium.org/p/chromium/issues/detail?id=487935#c17
-            // you can capture screen on Android Chrome >= 55 with flag: "Experimental ScreenCapture android"
-            window.IsAndroidChrome = false;
-            try {
-                if (navigator.userAgent.toLowerCase().indexOf("android") > -1 && /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)) {
-                    window.IsAndroidChrome = true;
-                }
-            } catch (e) {}
-
-			getScreenId(function(error, sourceId, screen_constraints) {
-                // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
-                // sourceId == null || 'string' || 'firefox'
-                // getUserMedia(screen_constraints, onSuccess, onFailure);
-
-                if (IsAndroidChrome) {
-                    screen_constraints = {
-                        mandatory: {
-                            chromeMediaSource: 'screen'
-                        },
-                        optional: []
-                    };
-                    
-                    screen_constraints = {
-                        video: screen_constraints
-                    };
-
-                    error = null;
-                }
-
-                if(error == 'not-installed') {
-                  alert('Please install Chrome extension. See the link below.');
-                  return;
-                }
-
-                if(error == 'installed-disabled') {
-                  alert('Please install or enable Chrome extension. Please check "chrome://extensions" page.');
-                  return;
-                }
-
-                if(error == 'permission-denied') {
-                  alert('Please make sure you are using HTTPs. Because HTTPs is required.');
-                  return;
-                }
-
-                console.info('getScreenId callback \n(error, sourceId, screen_constraints) =>\n', error, sourceId, screen_constraints);
-                //var peer = new Peer('someid', {host: 'localhost', port: 9000, path: '/peer', secure: true});
-                //console.log(peer);
-                //navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
-                navigator.mediaDevices.getUserMedia(screen_constraints).then(function(stream){
-                	document.querySelector('video').src = URL.createObjectURL(stream);
-
-                    stream.oninactive = stream.onended = function() {
-                        document.querySelector('video').src = null;
-                        //document.getElementById('capture-screen').disabled = false;
-                    };
-
-                    //document.getElementById('capture-screen').disabled = false;
-                }).catch(function(error){
-                	console.error('getScreenId error', error);
-
-                    alert('Failed to capture your screen. Please check Chrome console logs for further information.');
-                });
-                
-
-                
-            });
-		})();*/
-		</script>
+		<div class="loading">
+			<h3>Please wait...</h3>
+		</div>
+	</div>
+	<div id="side_panel_right">
+		<span class="info-panel-sub active">
+			<h2><i class="fa fa-globe" aria-hidden="true"></i>Overview</h2>
+			<p>
+				<span class="info-section">
+					<span class="info-title">Screen #1</span>
+					<span class="info-element">
+						<span class="info-name">Screen Width</span>
+						<span class="info-entry">1920px</span>
+					</span>
+					<span class="info-element">
+						<span class="info-name">Screen Height</span>
+						<span class="info-entry">1080px</span>
+					</span>
+				</span>
+				<span class="info-section">
+					<span class="info-title">Screen #2</span>
+					<span class="info-element">
+						<span class="info-name">Screen Width</span>
+						<span class="info-entry">1920px</span>
+					</span>
+					<span class="info-element">
+						<span class="info-name">Screen Height</span>
+						<span class="info-entry">1080px</span>
+					</span>
+				</span>
+			</p>
+		</span>
+		<span class="info-panel-sub">
+			<h2><i class="fa fa-television" aria-hidden="true"></i>GPU Information</h2>
+			<p>...</p>
+		</span>
+		<span class="info-panel-sub">
+			<h2><i class="fa fa-tachometer" aria-hidden="true"></i>CPU Information</h2>
+			<p>...</p>
+		</span>
+	</div>
+</div>

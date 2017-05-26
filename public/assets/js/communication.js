@@ -113,18 +113,23 @@ function createPeerConnection(server){
     return peerConnection;
 }
 
-function sendCall(){ //PC2
+function sendCall(peer){ //PC2
     var server = new CommunicationServer();
     var peerConnection = createPeerConnection(server);
+    $('#setup-call').hide();
+    $('.loading').show();
+
     //onaddstream is deprecated, use ontrack instead
     peerConnection.onaddstream = setStreamDisplay;
     server.ready().then(()=> {
-        server.send('requestPeerConnection', ['admin']);
+        server.send('requestPeerConnection', [peer]);
         server.recieveDescription().then((description)=> {
             peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch((error)=>{console.log(error);});
             peerConnection.createAnswer().then((description)=> {
                 peerConnection.setLocalDescription(description).then(()=> {
                     server.sendDescription(description);
+                    $('.loading').hide();
+                    $('#remoteVideo').show();
                 }).catch((error)=>{console.log(error);});
             }).catch((error)=> {
                 console.log(error);
@@ -147,6 +152,8 @@ function awaitCall(){ //PC1
     console.log("Trying to get media device");
     navigator.mediaDevices.getUserMedia(constraints).then((stream)=>{
         document.getElementById('remoteVideo').src = window.URL.createObjectURL(stream);
+        $('#setup-call').hide();
+        $('.loading').show();
         server.awaitPeerConnection().then(()=>{
             peerConnection.addStream(stream);
             peerConnection.createOffer().then((description)=>{
@@ -154,6 +161,8 @@ function awaitCall(){ //PC1
                     server.sendDescription(description);
                     server.recieveDescription().then((description)=>{
                         peerConnection.setRemoteDescription( new RTCSessionDescription(description) );
+                        $('.loading').hide();
+                        $('#remoteVideo').show();
                     }).catch((error)=>{console.log(error);});
                 }).catch(setLocalDescriptionError);
             }).catch( createOfferError );

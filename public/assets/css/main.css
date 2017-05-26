@@ -287,7 +287,7 @@ footer {
   transition: all 0.5s ease;
 }
 
-#loginregister-form .form-submit {
+.form-submit {
   border: none;
   background: #00a2d9;
   color: #fff;
@@ -303,11 +303,11 @@ footer {
   font-family: sans-serif;
 }
 
-#loginregister-form .form-submit:hover {
+.form-submit:hover {
   background: #0082a9;
 }
 
-#loginregister-form .form-entry {
+.form-entry {
   background: none;
   border: 1px solid #ccc;
   transition: border-color .25s ease, box-shadow .25s ease;
@@ -319,7 +319,7 @@ footer {
   color: #fff;
 }
 
-#loginregister-form .form-entry:focus {
+.form-entry:focus {
   border-color: #00a2d9;
 }
 
@@ -440,4 +440,28 @@ hr {
 
 br { /*clearfix*/
   clear: both;
+}
+
+/*
+  COMMUNICATION STYLING
+*/
+
+#remoteVideo {
+  width: 100%;
+  height:100%;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  display: none;
+}
+
+#setup-call {
+  width:50%;
+  margin:0 auto;
+}
+
+.loading {
+  color: #fff;
+  display:none;
+  width:50%;
+  margin:0 auto;
 }
