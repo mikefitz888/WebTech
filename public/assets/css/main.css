@@ -340,6 +340,7 @@ footer {
   z-index: 99;
   width:100%;
   left: -1px;
+  display: none;
 }
 
 .user-menu ul {

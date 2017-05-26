@@ -107,6 +107,20 @@
             });
         e.preventDefault();
       });
+
+      $(".expand-menu").on("click", e => {
+        var menu = $(".user-menu").show();
+        $(document).on('mouseup.userMenu', e => {
+            var container = $(".settings-wrapper");
+
+            // if the target of the click isn't the container nor a descendant of the container
+            if (!container.is(e.target) && container.has(e.target).length === 0) 
+            {
+                menu.hide();
+                $(document).unbind('mouseup.userMenu');
+            }
+        });
+      });
     });
     </script>
 
@@ -189,7 +203,7 @@
       <span class="settings">
         <span class="settings-wrapper">
           {{? it.auth }}
-          <a href="#" class="tr-button"><i class="fa fa-chevron-down" aria-hidden="true"></i>&nbsp;Welcome {{=it.username}}!&nbsp;<i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+          <a href="#" class="tr-button expand-menu"><i class="fa fa-chevron-down" aria-hidden="true"></i>&nbsp;Welcome {{=it.username}}!&nbsp;<i class="fa fa-chevron-down" aria-hidden="true"></i></a>
           <div class="user-menu">
             <ul>
               <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Settings</a></li>
