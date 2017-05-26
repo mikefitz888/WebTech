@@ -114,7 +114,8 @@ app.get('/', sessionShare, (req, res) => {
     //req.session.auth = true;
     //req.session.username = "admin";
     //req.session.name = "admin";
-    res.render('index', {target: "/get", auth: req.session.auth, page:'home'});
+    console.log(req.session);
+    res.render('index', {target: "/get", session: req.session, auth: req.session.auth, page:'home'});
 });
 
 app.get('/find', (req, res) => {
@@ -151,6 +152,7 @@ app.post('/login', (req, res) => {
             console.log('fine');
             console.log(name);
             req.session.name = name;
+            console.log(req.session);
         }).catch(error => {req.session.name = req.session.username; console.log('error'); console.log(req.session.username);});
         res.send("success");
     }).catch((error)=>{
