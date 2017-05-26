@@ -111,18 +111,18 @@ app.set('view engine', 'js');
 
 //Take care of routing
 app.get('/', sessionShare, (req, res) => {
-    req.session.auth = true;
-    req.session.username = "admin";
-    req.session.name = "admin";
+    //req.session.auth = true;
+    //req.session.username = "admin";
+    //req.session.name = "admin";
     res.render('index', {target: "/get", auth: req.session.auth, page:'home'});
 });
 
 app.get('/find', (req, res) => {
     //res.send('/.*fly$/')
     //res.sendFile('base.html', options);
-    req.session.auth = true;
-    req.session.username = "admin";
-    req.session.name = "admin";
+    //req.session.auth = true;
+    //req.session.username = "admin";
+    //req.session.name = "admin";
     //console.log(req.session);
     res.render('base', {target: "/get", session: req.session, page:'find'});
 });
@@ -130,9 +130,9 @@ app.get('/find', (req, res) => {
 app.get('/give', (req, res) => {
     //res.send('/.*fly$/')
     //res.sendFile('base.html', options);
-    req.session.auth = true;
-    req.session.username = "helper";
-    req.session.name = "helper";
+    //req.session.auth = true;
+    //req.session.username = "helper";
+    //req.session.name = "helper";
     var users = [];
     for(var key in UserEventHandlers){
         if(UserEventHandlers[key].help_request) users.push(UserEventHandlers[key]);
