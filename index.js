@@ -101,7 +101,7 @@ app.engine('js', (filePath, options, callback) => {
     var header = require('./views/header');
     var render = require(filePath.substring(0, filePath.length - 3));
 
-    var output = header({auth: options.session.auth, username: options.session.username || "Anonymous"}) + render(options);
+    var output = header({auth: options.session.auth, username: options.session.username || "Anonymous", name: options.session.name || "Anonymous"}) + render(options);
     console.log(UserEventHandlers);
     return callback(null, output);
 });
@@ -113,6 +113,7 @@ app.set('view engine', 'js');
 app.get('/', sessionShare, (req, res) => {
     req.session.auth = true;
     req.session.username = "admin";
+    req.session.name = "admin";
     res.render('index', {target: "/get", auth: req.session.auth});
 });
 
@@ -121,6 +122,7 @@ app.get('/find', (req, res) => {
     //res.sendFile('base.html', options);
     req.session.auth = true;
     req.session.username = "admin";
+    req.session.name = "admin";
     //console.log(req.session);
     res.render('base', {target: "/get", session: req.session});
 });
@@ -130,6 +132,7 @@ app.get('/give', (req, res) => {
     //res.sendFile('base.html', options);
     req.session.auth = true;
     req.session.username = "helper";
+    req.session.name = "helper";
     var users = [];
     for(var key in UserEventHandlers){
         if(UserEventHandlers[key].help_request) users.push(UserEventHandlers[key]);
@@ -143,6 +146,10 @@ app.post('/login', (req, res) => {
     db.validate(req.body.username, req.body.password).then(() => {
         req.session.auth = true;
         req.session.username = req.body.username;
+        db.getName(req.body.username).then(name =>
+        {
+            req.session.name = name;
+        }).catch(error => {req.session.name = req.session.username});
         res.send("success");
     }).catch((error)=>{
         res.send(error);
@@ -168,6 +175,7 @@ app.post('/register', (req, res) => {
     else db.register(req.body).then(()=>{
         req.session.auth = true;
         req.session.username = req.body.username;
+        req.session.name = req.body.given_name != "" ? req.body.given_name : req.body.name;
         res.send("success");
     }).catch((error)=>{
         res.send(error);

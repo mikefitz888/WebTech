@@ -69,6 +69,25 @@
         });
     }
 
+    DBClass.prototype.getName = function(username)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            this.db.serialize(() =>
+            {
+                this.db.get("SELECT givenname FROM users_givenname WHERE userid IN (SELECT id FROM users WHERE username = ?)", username, (err, row) =>
+                {
+                    if (!row) this.db.get("SELECT fullname FROM users_fullname WHERE userid IN (SELECT id FROM users WHERE username = ?)", username, (err, row) =>
+                    {
+                        if (row) resolve(row.fullname);
+                        else reject("User has no name!");
+                    });
+                    else resolve(row.givenname);
+                });
+            });
+        });
+    }
+
     DBClass.prototype.register = function(form)
     {
         var username = form.username.toLowerCase();
