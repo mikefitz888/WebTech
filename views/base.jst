@@ -1,9 +1,32 @@
 <script type="text/javascript">
 	var listener_enabled = true;
+
 	$(()=>{
+		/*
+			User Information
+		*/
+		var information_packet = new Object();
+		information_packet.platform = navigator.platform;
+		information_packet.appCodeName = navigator.appCodeName;
+		information_packet.screen_width = screen.width;
+		information_packet.screen_height = screen.height;
+		information_packet.userAgent = navigator.userAgent;
+
+		var el = createInfoPanel('Overview').append($('<p></p>')
+			.append(createInfoSection('System').append(createInfoElement('OS', navigator.platform)).append(createInfoElement('Browser', navigator.appCodeName)))
+			.append(createInfoSection('Screen').append(createInfoElement('Width', screen.width)).append(createInfoElement('Height', screen.height)))
+		);
+
+		var details = createInfoPanel('Details').append($('<p></p>')
+			.append(createInfoSection('User-Agent').append('<span class="info-element full"><span class="info-name">'+navigator.userAgent+'</span></span>'))
+		);
+		//var el = createInfoPanel('TITLE').append($('<p></p>').append(createInfoSection('System').append(createInfoElement('OS', navigator.platform)).append(createInfoElement('Browser', navigator.appCodeName))));
+		$('#side_panel_right').append(el);
+		$('#side_panel_right').append(details);
+
 		$('#request_form').submit(e => {
 			$('#request_form .form-submit').prop("value", "Choose A Window");
-			awaitCall(); //Perhaps pass options from here
+			awaitCall(information_packet); //Perhaps pass options from here
 			e.preventDefault();
 		});
 	});
@@ -27,40 +50,6 @@
 		</div>
 	</div>
 	<div id="side_panel_right">
-		<span class="info-panel-sub active">
-			<h2><i class="fa fa-globe" aria-hidden="true"></i>Overview</h2>
-			<p>
-				<span class="info-section">
-					<span class="info-title">Screen #1</span>
-					<span class="info-element">
-						<span class="info-name">Screen Width</span>
-						<span class="info-entry">1920px</span>
-					</span>
-					<span class="info-element">
-						<span class="info-name">Screen Height</span>
-						<span class="info-entry">1080px</span>
-					</span>
-				</span>
-				<span class="info-section">
-					<span class="info-title">Screen #2</span>
-					<span class="info-element">
-						<span class="info-name">Screen Width</span>
-						<span class="info-entry">1920px</span>
-					</span>
-					<span class="info-element">
-						<span class="info-name">Screen Height</span>
-						<span class="info-entry">1080px</span>
-					</span>
-				</span>
-			</p>
-		</span>
-		<span class="info-panel-sub">
-			<h2><i class="fa fa-television" aria-hidden="true"></i>GPU Information</h2>
-			<p>...</p>
-		</span>
-		<span class="info-panel-sub">
-			<h2><i class="fa fa-tachometer" aria-hidden="true"></i>CPU Information</h2>
-			<p>...</p>
-		</span>
+
 	</div>
 </div>

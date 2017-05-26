@@ -211,6 +211,12 @@ footer {
   text-align: right;
   width:50%;
   display: inline-block;
+  font-weight: bold;
+}
+
+.info-element.full .info-name {
+  width:100%;
+  text-align: center;
 }
 
 .info-name:after {
@@ -225,6 +231,10 @@ footer {
 .info-element {
   float:left;
   width: 50%;
+}
+
+.info-element.full {
+  width:100%;
 }
 
 .info-section:after {

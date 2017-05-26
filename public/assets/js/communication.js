@@ -138,7 +138,7 @@ function sendCall(peer){ //PC2
     }).catch((error)=> {console.log(error);});
 }
 
-function awaitCall(){ //PC1
+function awaitCall(info_packet){ //PC1
     var server = new CommunicationServer();
     var peerConnection = createPeerConnection(server);
 
@@ -154,18 +154,21 @@ function awaitCall(){ //PC1
         document.getElementById('remoteVideo').src = window.URL.createObjectURL(stream);
         $('#setup-call').hide();
         $('.loading').show();
-        server.awaitPeerConnection().then(()=>{
-            peerConnection.addStream(stream);
-            peerConnection.createOffer().then((description)=>{
-                peerConnection.setLocalDescription(description).then(()=>{
-                    server.sendDescription(description);
-                    server.recieveDescription().then((description)=>{
-                        peerConnection.setRemoteDescription( new RTCSessionDescription(description) );
-                        $('.loading').hide();
-                        $('#remoteVideo').show();
-                    }).catch((error)=>{console.log(error);});
-                }).catch(setLocalDescriptionError);
-            }).catch( createOfferError );
+        server.ready().then()=>{
+            server.send('infoPacket', info_packet);
+            server.awaitPeerConnection().then(()=>{
+                peerConnection.addStream(stream);
+                peerConnection.createOffer().then((description)=>{
+                    peerConnection.setLocalDescription(description).then(()=>{
+                        server.sendDescription(description);
+                        server.recieveDescription().then((description)=>{
+                            peerConnection.setRemoteDescription( new RTCSessionDescription(description) );
+                            $('.loading').hide();
+                            $('#remoteVideo').show();
+                        }).catch((error)=>{console.log(error);});
+                    }).catch(setLocalDescriptionError);
+                }).catch( createOfferError );
+            });
         });
     }).catch((error)=>{console.log(error);});
 }
@@ -182,3 +185,22 @@ function setLocalDescriptionSuccess(){ console.log("Local description set."); }
 
 function createOfferError(error){ console.log(error); }
 function setLocalDescriptionError(error){ console.log(error); }
+
+function createInfoElement(name, entry){
+    return $(   '<span class="info-element">\
+                    <span class="info-name">'+name+'</span>\
+                    <span class="info-entry">'+entry+'</span>\
+                </span>' );
+}
+
+function createInfoSection(title){
+    return $(   '<span class="info-section">\
+                    <span class="info-title">'+title+'</span>\
+                </span>');
+}
+
+function createInfoPanel(title){
+    return $(   '<span class="info-panel-sub active">\
+                    <h2><i class="fa fa-globe" aria-hidden="true"></i>'+title+'</h2>\
+                </span>');
+}

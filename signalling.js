@@ -28,6 +28,7 @@
                 this.help_request = true;
                 this.displayed_description = "Lorem Ipsum"
                 this.username = username;
+                this.info_packet;
 
                 ws.on('message', (message)=>{
                     console.log(message);
@@ -44,11 +45,16 @@
                     }
                 });
 
+                this.on('infoPacket', (info_packet)=>{
+                    this.info_packet = info_packet;
+                });
+
                 this.on('requestPeerConnection', (peer)=>{
                     this.help_request = false;
                     this.partner = UserEventHandlers[peer];
                     this.partner.partner = this;
                     this.partner.emit('peerConnection');
+                    this.partner.emit('sendInfoPacket', this.info_packet);
                 });
 
                 this.on('ownICECandidate', (candidate)=>{
@@ -71,6 +77,13 @@
                     ws.send(JSON.stringify({
                         event: 'sessionDescription',
                         message: [description]
+                    }));
+                });
+
+                this.on('sendInfoPacket', (info_packet)=>{
+                    ws.send(JSON.stringify({
+                        event: 'infoPacket',
+                        message: [infoPacket]
                     }));
                 });
 
