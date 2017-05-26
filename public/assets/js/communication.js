@@ -51,7 +51,17 @@ var CommunicationServer = function(){
     });
 
     this.on('infoPacket', (info_packet)=>{
-        console.log(info_packet);
+        var el = createInfoPanel('Overview').append($('<p></p>')
+            .append(createInfoSection('System').append(createInfoElement('OS', info_packet.platform)).append(createInfoElement('Browser', info_packet.appCodeName)))
+            .append(createInfoSection('Screen').append(createInfoElement('Width', info_packet.screen_width)).append(createInfoElement('Height', info_packet.screen_height)))
+        );
+
+        var details = createInfoPanel('Details').append($('<p></p>')
+            .append(createInfoSection('User-Agent').append('<span class="info-element full"><span class="info-name">'+info_packet.userAgent+'</span></span>'))
+        );
+        //var el = createInfoPanel('TITLE').append($('<p></p>').append(createInfoSection('System').append(createInfoElement('OS', navigator.platform)).append(createInfoElement('Browser', navigator.appCodeName))));
+        $('#side_panel_right').append(el);
+        $('#side_panel_right').append(details);
     });
 }
 
