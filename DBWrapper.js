@@ -52,7 +52,7 @@
         {
             this.db.serialize(() =>
             {
-                this.db.get("SELECT password, salt FROM users WHERE username = ?", username, (err, row) =>
+                this.db.get("SELECT password, salt FROM users WHERE username = ?", username.toLowerCase(), (err, row) =>
                 {
                     if (row && validatePassword(password, row.password, row.salt))
                     {
@@ -71,6 +71,7 @@
 
     DBClass.prototype.getName = function(username)
     {
+        console.log('getName('+username+')');
         return new Promise((resolve, reject) =>
         {
             this.db.serialize(() =>

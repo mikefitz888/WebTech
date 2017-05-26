@@ -146,10 +146,12 @@ app.post('/login', (req, res) => {
     db.validate(req.body.username, req.body.password).then(() => {
         req.session.auth = true;
         req.session.username = req.body.username;
-        db.getName(req.body.username).then(name =>
+        db.getName(req.body.username.toLowerCase()).then(name =>
         {
+            console.log('fine');
+            console.log(name);
             req.session.name = name;
-        }).catch(error => {req.session.name = req.session.username});
+        }).catch(error => {req.session.name = req.session.username; console.log('error'); console.log(req.session.username);});
         res.send("success");
     }).catch((error)=>{
         res.send(error);
