@@ -15,6 +15,8 @@ var peerConnectionConfig = {
     ]
 };
 
+var global_loading_done = true;
+
 /*
     Messages to and from the server take the following format:
     {event: string, message: [args]}
@@ -132,6 +134,10 @@ function sendCall(peer){ //PC2
     var peerConnection = createPeerConnection(server);
     $('#setup-call').hide();
     $('.loading').show();
+    global_loading_done = false;
+    var canvas = document.getElementById('cnvLoader');
+    var context = canvas.getContext("2d");
+    playLoadingAnimation(context, Date.now());
 
     //onaddstream is deprecated, use ontrack instead
     peerConnection.onaddstream = setStreamDisplay;
@@ -144,6 +150,7 @@ function sendCall(peer){ //PC2
                     server.sendDescription(description);
                     $('.loading').hide();
                     $('#remoteVideo').show();
+                    global_loading_done = true;
                 }).catch((error)=>{console.log(error);});
             }).catch((error)=> {
                 console.log(error);
@@ -168,6 +175,10 @@ function awaitCall(info_packet){ //PC1
         document.getElementById('remoteVideo').src = window.URL.createObjectURL(stream);
         $('#setup-call').hide();
         $('.loading').show();
+        global_loading_done = false;
+        var canvas = document.getElementById('cnvLoader');
+        var context = canvas.getContext("2d");
+        playLoadingAnimation(context, Date.now());
         server.send('infoPacket', info_packet);
         server.awaitPeerConnection().then(()=>{
             //server.ready().then(()=>{
@@ -180,6 +191,7 @@ function awaitCall(info_packet){ //PC1
                             peerConnection.setRemoteDescription( new RTCSessionDescription(description) );
                             $('.loading').hide();
                             $('#remoteVideo').show();
+                            global_loading_done = true;
                         }).catch((error)=>{console.log(error);});
                     }).catch(setLocalDescriptionError);
                 }).catch( createOfferError );
@@ -221,5 +233,25 @@ function createInfoPanel(title){
 }
 
 function playLoadingAnimation(context){
+    context.clearRect(0, 0, 800, 200)
+    var centerX = 100, centerY = 100;
 
+    context.fillStyle = '#00a2d9';
+    context.font = 'bold 22px sans-serif';
+    context.textBaseline = 'bottom';
+    context.fillText('Please Wait for a Helper to Respond.', 200, 111);
+
+    var count = 4;
+    for(var i = 0; i < 4; i++){
+        context.beginPath();
+        context.arc(centerX + Math.sin((i/4)*Math.PI*2 + Date.now()/400)*20, centerY + Math.cos((i/4)*Math.PI*2 + Date.now()/400)*20, 10, 0, 2 * Math.PI, false);
+        var opacity = ( Math.sin( Date.now()/200 + (i/4)*Math.PI*2 )+1 )/2;
+        context.fillStyle = 'rgba(0, 162, 217, '+opacity+')';
+        context.fill();
+    }
+
+    window.requestAnimationFrame((dt)=>{
+        if(!global_loading_done)
+            playLoadingAnimation(context);
+    });
 }
