@@ -20,13 +20,18 @@
       <li>&gt;24 for Depth (out of 40)</li>
     </ul>
     <h2>HTML</h2>
-    We made use of the dot.js framework for html templating and used html 5 features.
+    We made use of the dot.js templating engine for html templating and used html 5 features. Such as input types for form elements
+    to allow browser validation.
 
     <h2>CSS</h2>
-    <b>How do we express this?</b>
+    The site makes extensive use of CSS including CSS3. This is used mainly to aid the appearance of the site but also positioning of
+    elements in rare cases (such as the normally hidden user dropdown menu).
 
     <h2>JS</h2>
-    <b>How do we express this?</b>
+    JavaScript plays a huge role in the functioning of this website. It is fundamental to both the server-side and client-side operation.
+    It is used for communicating with the server in several cases, using websockets as well as AJAX. And also for animating the canvas
+    elements. JQuery is used throughout to make interacting with elements easier, such as toggling visible tabs or adding dynamically 
+    generated content recieved from websocket.
 
     <h2>PNG</h2>
     The Logo was created in GIMP by performing the following steps;
@@ -51,7 +56,14 @@
     <img src="antialias.png"/>
     <h2>SVG</h2>
     <h2>Server</h2>
-    <b>MIKE - Talk about https, sockets, certificates</b><br/>
+    In order to support WebRTC, the site needed to use SSL, otherwise the browser would 
+    deny any requests. We generated a self-signed SSL certificate using OpenSSL and use
+    that to fulfil this requirement. We run the server on port 443, as is the default
+    port for SSL used by the browser, meaning that accessing https://localhost, takes
+    the user to the correct port. We make use of websockets, on the same port, and a 
+    "sub-server" that effectively deals with the websocket events. This acts as a
+    signalling server which co-ordinates peer-to-peer communication between two users.
+    <br/>
 
     In order to protect our users passwords, we used the stanford crypto library
     to hash all the users passwords serverside, using a randomly and securely
@@ -74,12 +86,17 @@
     Additionally, our infrastructure is secure against SQL injection.
 
     <h2>Dynamic Pages</h2>
-    <b>MIKE</b>
+    Dynamic content is added to pages in a couple of ways. A templating framework
+    DoT.js is coupled with our own data sharing framework to control what is displayed.
+    This is mainly used to show usernames or highlight active tabs.
 
     <h2>Depth</h2>
     For our depth in the website, we have used WebRTC to send a user's desktop
     screen capture across to a helper user, they are then able to see the user's
-    screen and advise them. <b>MIKE</b>
+    screen and advise them. We created a robust event based framework, to manage
+    interactions between the client and the framework. JS Promises manage a lot
+    of the interaction to ensure correct ordering of events while allowing 
+    concurrent processing.
 
   </body>
 </html>

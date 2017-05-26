@@ -144,17 +144,22 @@ app.get('/give', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+    console.log(req.session);
     db.validate(req.body.username, req.body.password).then(() => {
         req.session.auth = true;
         req.session.username = req.body.username;
         db.getName(req.body.username.toLowerCase()).then(name =>
         {
-            console.log('fine');
-            console.log(name);
+            //console.log('fine');
+            //console.log(name);
             req.session.name = name;
-            console.log(req.session);
-        }).catch(error => {req.session.name = req.session.username; console.log('error'); console.log(req.session.username);});
-        res.send("success");
+            res.send("success");
+        }).catch(error =>
+        {
+            req.session.name = req.session.username;
+            //console.log('error'); console.log(req.session.username);
+            res.send("success");
+        });
     }).catch((error)=>{
         res.send(error);
     });
