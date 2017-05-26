@@ -49,6 +49,10 @@ var CommunicationServer = function(){
             console.log(error);
         });
     });
+
+    this.on('infoPacket', (info_packet)=>{
+        console.log(info_packet);
+    });
 }
 
 /*
@@ -154,9 +158,10 @@ function awaitCall(info_packet){ //PC1
         document.getElementById('remoteVideo').src = window.URL.createObjectURL(stream);
         $('#setup-call').hide();
         $('.loading').show();
-        server.ready().then()=>{
-            server.send('infoPacket', info_packet);
-            server.awaitPeerConnection().then(()=>{
+        server.send('infoPacket', info_packet);
+        server.awaitPeerConnection().then(()=>{
+            //server.ready().then(()=>{
+                
                 peerConnection.addStream(stream);
                 peerConnection.createOffer().then((description)=>{
                     peerConnection.setLocalDescription(description).then(()=>{
@@ -168,7 +173,7 @@ function awaitCall(info_packet){ //PC1
                         }).catch((error)=>{console.log(error);});
                     }).catch(setLocalDescriptionError);
                 }).catch( createOfferError );
-            });
+            //});
         });
     }).catch((error)=>{console.log(error);});
 }

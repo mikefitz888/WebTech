@@ -54,7 +54,11 @@
                     this.partner = UserEventHandlers[peer];
                     this.partner.partner = this;
                     this.partner.emit('peerConnection');
-                    this.partner.emit('sendInfoPacket', this.info_packet);
+
+                    ws.send(JSON.stringify({
+                        event: 'infoPacket',
+                        message: [this.partner.info_packet]
+                    }));
                 });
 
                 this.on('ownICECandidate', (candidate)=>{
@@ -77,13 +81,6 @@
                     ws.send(JSON.stringify({
                         event: 'sessionDescription',
                         message: [description]
-                    }));
-                });
-
-                this.on('sendInfoPacket', (info_packet)=>{
-                    ws.send(JSON.stringify({
-                        event: 'infoPacket',
-                        message: [infoPacket]
                     }));
                 });
 
