@@ -219,3 +219,7 @@ function createInfoPanel(title){
                     <h2><i class="fa fa-globe" aria-hidden="true"></i>'+title+'</h2>\
                 </span>');
 }
+
+function playLoadingAnimation(context){
+
+}
