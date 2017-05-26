@@ -19,6 +19,17 @@
       <li>A/B for Dynamic pages</li>
       <li>&gt;24 for Depth (out of 40)</li>
     </ul>
+    <h2>Foreword</h2>
+    To test the peer-to-peer communication features of the website you need to be using 2 different sessions. 2 Firefox windows both
+    use the same session. We got around this by using a chrome window and a firefox window.
+    Browser Requirements: (We're choosing to support Chrome/FireFox only)
+    Chrome:
+        Enable: Experimental Extension APIs in chrome://flags
+    Firefox:
+        Shouldn't need any extras, I had disabled some flags for privacy-enhancement which prevented RTC from working. These had to be returned to default.
+        The Screensharing whitelist is no longer needed to share your screen or windows starting Firefox 52 (April).
+        If using earlier version, add localhost to media.getusermedia.screensharing.allowed_domains in about:config
+
     <h2>HTML</h2>
     We made use of the dot.js templating engine for html templating and used html 5 features. Such as input types for form elements
     to allow browser validation.
@@ -55,6 +66,9 @@
     <img src="transparency.png"/>
     <img src="antialias.png"/>
     <h2>SVG</h2>
+    We used a HTML5 canvas element to display an animated loading feature while the user
+    is waiting for a second user to respond to their request.
+
     <h2>Server</h2>
     In order to support WebRTC, the site needed to use SSL, otherwise the browser would 
     deny any requests. We generated a self-signed SSL certificate using OpenSSL and use
@@ -88,7 +102,9 @@
     <h2>Dynamic Pages</h2>
     Dynamic content is added to pages in a couple of ways. A templating framework
     DoT.js is coupled with our own data sharing framework to control what is displayed.
-    This is mainly used to show usernames or highlight active tabs.
+    This is mainly used to show usernames or highlight active tabs. Another method
+    employs the use of websockets to pass information from one user to the other, 
+    which then updates their information panel.
 
     <h2>Depth</h2>
     For our depth in the website, we have used WebRTC to send a user's desktop
