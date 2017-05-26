@@ -2,32 +2,84 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
   lang="en-GB" xml:lang="en-GB">
-<head>
-<meta charset="UTF-8"/>
-<title>Web Tech Report - MF14820/JW14896</title>
-</head>
-<body>
-<h1>Web Tech Report - MF14820/JW14896</h1>
-<ul>
-<li>A for HTML</li>
-<li>A for CSS</li>
-<li>A for JS</li>
-<li>A for PNG</li>
-<li>? for SVG</li>
-<li>A for Server</li>
-<li>A for Database</li>
-<li>A/B for Dynamic pages</li>
-<li>&gt;24 for Depth (out of 40)</li>
-</ul>
-<h2>HTML</h2>
-<h2>CSS</h2>
-<h2>JS</h2>
-<h2>PNG</h2>
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Web Tech Report - MF14820/JW14896</title>
+  </head>
+  <body>
+    <h1>Web Tech Report - MF14820/JW14896</h1>
+    <ul>
+      <li>A for HTML</li>
+      <li>A for CSS</li>
+      <li>A for JS</li>
+      <li>A for PNG</li>
+      <li>? for SVG</li>
+      <li>A for Server</li>
+      <li>A for Database</li>
+      <li>A/B for Dynamic pages</li>
+      <li>&gt;24 for Depth (out of 40)</li>
+    </ul>
+    <h2>HTML</h2>
+    We made use of the dot.js framework for html templating and used html 5 features.
 
-<h2>SVG</h2>
-<h2>Server</h2>
-<h2>Database</h2>
-<h2>Dynamic Pages</h2>
-<h2>Depth</h2>
-</body>
+    <h2>CSS</h2>
+    <b>How do we express this?</b>
+
+    <h2>JS</h2>
+    <b>How do we express this?</b>
+
+    <h2>PNG</h2>
+    The Logo was created in GIMP by performing the following steps;
+    <ul>
+      <li>Make transparent background image</li>
+      <li>Write the text with text tool onto top layer</li>
+      <li>Create an ellipse with circle select on new layer under text</li>
+      <li>Fill the ellipse with blue</li>
+      <li>
+        In a layer between blue and text make a black to transparent gradiant
+        (could have used blue gradient to blue, but this experiments with layer
+         opacity)
+      </li>
+      <li>Set layer opacity of black gradient to 30%</li>
+      <li>Run antialias tool to smooth edges, resize canvas to desired dimenions</li>
+    </ul>
+    The following pictures capture this process.<br/>
+    <img src="circle.png"/>
+    <img src="gradienttool.png"/>
+    <img src="blackened.png"/>
+    <img src="transparency.png"/>
+    <img src="antialias.png"/>
+    <h2>SVG</h2>
+    <h2>Server</h2>
+    <b>MIKE - Talk about https, sockets, certificates</b><br/>
+
+    In order to protect our users passwords, we used the stanford crypto library
+    to hash all the users passwords serverside, using a randomly and securely
+    generated salt which is at least the length of the hash function's output
+    for the most secure salting. In addition, the source code has a hardcoded
+    second salt called a pepper, which is an additional defense should the database
+    be stolen but not the sourcecode.
+
+    <h2>Database</h2>
+    Our database is interacted with via a separate <em>DBWrapper.js</em> module,
+    which controls all interaction with the database. The database itself is
+    designed to use relational linking between many tables that each handle a
+    specific part of a user's data, instead of just keeping all data in the same
+    table.<br/><br/>
+
+    For security, the database does not store any plaintext passwords, it stores
+    both the salt and the hash of the "seasoned" password (the password has both
+    a salt and a pepper added to it). This ensures that a leaked database does not
+    easily compromise the security of our users (covered more in <em>Server</em>).
+    Additionally, our infrastructure is secure against SQL injection.
+
+    <h2>Dynamic Pages</h2>
+    <b>MIKE</b>
+
+    <h2>Depth</h2>
+    For our depth in the website, we have used WebRTC to send a user's desktop
+    screen capture across to a helper user, they are then able to see the user's
+    screen and advise them. <b>MIKE</b>
+
+  </body>
 </html>
